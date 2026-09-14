@@ -51,29 +51,31 @@
 
         body::before {
             content: "";
+
             position: fixed;
 
-            top: -40px;
-            left: -90px;
+            top: -55px;
+            left: -100px;
 
-            width: 430px;
-            height: 430px;
+            width: 390px;
+            height: 390px;
 
             background-image:
                 linear-gradient(
-                    rgba(255, 255, 255, 0.58),
-                    rgba(255, 255, 255, 0.58)
+                    rgba(255, 255, 255, 0.70),
+                    rgba(255, 255, 255, 0.70)
                 ),
                 url("https://images.unsplash.com/photo-1592841200221-a6898f307baa?auto=format&fit=crop&w=900&q=80");
 
             background-size: cover;
             background-position: center;
 
-            opacity: 0.16;
+            opacity: 0.13;
 
             border-radius: 0 0 55% 0;
 
             pointer-events: none;
+
             z-index: -2;
         }
 
@@ -83,27 +85,28 @@
 
             position: fixed;
 
-            right: -100px;
-            bottom: -80px;
+            right: -110px;
+            bottom: -100px;
 
-            width: 420px;
-            height: 420px;
+            width: 400px;
+            height: 400px;
 
             background-image:
                 linear-gradient(
-                    rgba(255, 255, 255, 0.62),
-                    rgba(255, 255, 255, 0.62)
+                    rgba(255, 255, 255, 0.72),
+                    rgba(255, 255, 255, 0.72)
                 ),
                 url("https://images.unsplash.com/photo-1561136594-7f68413baa99?auto=format&fit=crop&w=900&q=80");
 
             background-size: cover;
             background-position: center;
 
-            opacity: 0.14;
+            opacity: 0.12;
 
             border-radius: 55% 0 0 0;
 
             pointer-events: none;
+
             z-index: -2;
         }
 
@@ -115,13 +118,14 @@
         header {
             width: 100%;
 
-            background: rgba(255, 255, 255, 0.94);
+            background: rgba(255, 255, 255, 0.95);
 
             border-bottom: 1px solid #e5e7eb;
 
-            padding: 12px 5%;
+            padding: 10px 5%;
 
             position: sticky;
+
             top: 0;
 
             z-index: 100;
@@ -135,32 +139,38 @@
             margin: auto;
 
             display: flex;
+
             align-items: center;
         }
 
         .brand {
             display: flex;
+
             align-items: center;
-            gap: 10px;
+
+            gap: 9px;
         }
 
         .brand-icon {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
 
-            border-radius: 11px;
+            border-radius: 10px;
 
             background: #e8f5e9;
 
             display: flex;
+
             align-items: center;
+
             justify-content: center;
 
-            font-size: 20px;
+            font-size: 19px;
         }
 
         .brand h1 {
-            font-size: 21px;
+            font-size: 20px;
+
             font-weight: 800;
 
             color: #166534;
@@ -182,20 +192,22 @@
 
             margin: 0 auto;
 
-            padding: 35px 5% 75px;
+            padding: 32px 5% 75px;
         }
 
 
-        /* Compact introduction */
+        /* =========================================
+           INTRO
+        ========================================= */
 
         .intro {
             text-align: center;
 
-            margin-bottom: 35px;
+            margin-bottom: 32px;
         }
 
         .intro h2 {
-            font-size: 32px;
+            font-size: 31px;
 
             line-height: 1.2;
 
@@ -203,13 +215,13 @@
 
             color: #111827;
 
-            margin-bottom: 7px;
+            margin-bottom: 6px;
 
             letter-spacing: -0.7px;
         }
 
         .intro p {
-            max-width: 650px;
+            max-width: none;
 
             margin: auto;
 
@@ -218,6 +230,8 @@
             font-size: 15px;
 
             line-height: 1.6;
+
+            white-space: nowrap;
         }
 
 
@@ -228,7 +242,7 @@
 
             color: #111827;
 
-            margin-bottom: 18px;
+            margin-bottom: 17px;
         }
 
 
@@ -239,7 +253,8 @@
         .plot-grid {
             display: grid;
 
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
 
             gap: 25px;
         }
@@ -252,7 +267,7 @@
         .plot-card {
             position: relative;
 
-            background: rgba(255, 255, 255, 0.94);
+            background: rgba(255, 255, 255, 0.96);
 
             border: 1px solid #e5e7eb;
 
@@ -273,25 +288,31 @@
             overflow: hidden;
         }
 
+
+        /* Decorative circle moved to top-right */
+
         .plot-card::after {
             content: "";
 
             position: absolute;
 
-            width: 110px;
-            height: 110px;
+            width: 90px;
+            height: 90px;
 
             right: -45px;
-            bottom: -45px;
+            top: -45px;
 
             background: #e8f5e9;
 
             border-radius: 50%;
 
-            opacity: 0.7;
+            opacity: 0.55;
 
             pointer-events: none;
+
+            z-index: 0;
         }
+
 
         .plot-card:hover {
             transform: translateY(-5px);
@@ -302,6 +323,19 @@
                 0 15px 35px rgba(15, 23, 42, 0.11);
         }
 
+
+        .plot-card-header,
+        .plot-content,
+        .view-more {
+            position: relative;
+
+            z-index: 1;
+        }
+
+
+        /* =========================================
+           PLOT CARD HEADER
+        ========================================= */
 
         .plot-card-header {
             display: flex;
@@ -366,7 +400,8 @@
         .plot-content {
             display: grid;
 
-            grid-template-columns: 145px 1fr;
+            grid-template-columns:
+                145px 1fr;
 
             gap: 25px;
 
@@ -490,6 +525,37 @@
 
 
         /* =========================================
+           VIEW MORE
+        ========================================= */
+
+        .view-more {
+            margin-top: 20px;
+
+            padding-top: 14px;
+
+            border-top: 1px solid #eef0f2;
+
+            color: #16a34a;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            text-align: right;
+
+            transition:
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .plot-card:hover .view-more {
+            color: #15803d;
+
+            transform: translateX(3px);
+        }
+
+
+        /* =========================================
            DASHBOARD
         ========================================= */
 
@@ -575,7 +641,8 @@
         .dashboard-grid {
             display: grid;
 
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns:
+                1fr 1fr;
 
             gap: 24px;
         }
@@ -984,6 +1051,10 @@
                 font-size: 29px;
             }
 
+            .intro p {
+                white-space: normal;
+            }
+
         }
 
 
@@ -994,7 +1065,7 @@
             }
 
             header {
-                padding: 10px 5%;
+                padding: 9px 5%;
             }
 
             .brand h1 {
@@ -1123,7 +1194,9 @@
          HOME PAGE
     ========================================== -->
 
-    <main id="homePage" class="home-page">
+    <main
+        id="homePage"
+        class="home-page">
 
         <div class="home-container">
 
@@ -1135,8 +1208,7 @@
                 </h2>
 
                 <p>
-                    Select a tomato plot to view its predicted disease risk,
-                    environmental conditions, and recommended actions.
+                    Select a tomato plot to view its predicted disease risk, environmental conditions, and recommended actions.
                 </p>
 
             </section>
@@ -1775,7 +1847,7 @@
 
 
         /* =========================================
-           CREATE ONLY PLOT 1 & 2
+           CREATE PLOT CARDS
         ========================================== */
 
         function createPlotCards() {
@@ -1936,6 +2008,11 @@
 
                         </div>
 
+                    </div>
+
+
+                    <div class="view-more">
+                        Click to view more information →
                     </div>
 
                 `;
