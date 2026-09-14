@@ -17,10 +17,6 @@
 
     <style>
 
-        /* =========================================
-           GLOBAL
-        ========================================= */
-
         * {
             margin: 0;
             padding: 0;
@@ -46,7 +42,7 @@
 
 
         /* =========================================
-           TOMATO BACKGROUND DECORATION
+           TOMATO BACKGROUND
         ========================================= */
 
         body::before {
@@ -234,7 +230,6 @@
             white-space: nowrap;
         }
 
-
         .section-title {
             font-size: 21px;
 
@@ -288,9 +283,6 @@
             overflow: hidden;
         }
 
-
-        /* Decorative circle moved to top-right */
-
         .plot-card::after {
             content: "";
 
@@ -313,7 +305,6 @@
             z-index: 0;
         }
 
-
         .plot-card:hover {
             transform: translateY(-5px);
 
@@ -322,7 +313,6 @@
             box-shadow:
                 0 15px 35px rgba(15, 23, 42, 0.11);
         }
-
 
         .plot-card-header,
         .plot-content,
@@ -334,7 +324,7 @@
 
 
         /* =========================================
-           PLOT CARD HEADER
+           PLOT HEADER
         ========================================= */
 
         .plot-card-header {
@@ -355,11 +345,29 @@
             font-weight: 800;
 
             color: #111827;
+
+            display: flex;
+
+            align-items: baseline;
+
+            flex-wrap: wrap;
+
+            gap: 3px;
+        }
+
+        .plot-updated-time {
+            font-size: 12px;
+
+            font-weight: 600;
+
+            color: #9ca3af;
+
+            white-space: nowrap;
         }
 
 
         /* =========================================
-           RISK BADGES
+           RISK BADGE
         ========================================= */
 
         .risk-badge {
@@ -372,6 +380,8 @@
             font-weight: 800;
 
             letter-spacing: 0.3px;
+
+            white-space: nowrap;
         }
 
         .risk-low {
@@ -625,6 +635,22 @@
             color: #111827;
 
             margin-bottom: 3px;
+
+            display: flex;
+
+            align-items: baseline;
+
+            flex-wrap: wrap;
+
+            gap: 3px;
+        }
+
+        .dashboard-heading .plot-updated-time {
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #9ca3af;
         }
 
         .dashboard-heading p {
@@ -1165,9 +1191,7 @@
 <body>
 
 
-    <!-- =========================================
-         HEADER
-    ========================================== -->
+    <!-- HEADER -->
 
     <header>
 
@@ -1190,16 +1214,13 @@
     </header>
 
 
-    <!-- =========================================
-         HOME PAGE
-    ========================================== -->
+    <!-- HOME PAGE -->
 
     <main
         id="homePage"
         class="home-page">
 
         <div class="home-container">
-
 
             <section class="intro">
 
@@ -1227,15 +1248,12 @@
 
             </section>
 
-
         </div>
 
     </main>
 
 
-    <!-- =========================================
-         DASHBOARD PAGE
-    ========================================== -->
+    <!-- DASHBOARD PAGE -->
 
     <main
         id="dashboardPage"
@@ -1257,6 +1275,9 @@
 
                 <h2 id="dashboardPlotName">
                     Plot 1
+                    <span class="plot-updated-time">
+                        · Updated 20:05
+                    </span>
                 </h2>
 
                 <p>
@@ -1331,7 +1352,7 @@
                             <div
                                 id="updatedText"
                                 class="updated-text">
-                                Updated recently
+                                Updated 20:05
                             </div>
 
                         </div>
@@ -1606,10 +1627,6 @@
     </main>
 
 
-    <!-- =========================================
-         JAVASCRIPT
-    ========================================== -->
-
     <script>
 
 
@@ -1624,6 +1641,8 @@
 
                 name: "Plot 1",
 
+                updatedTime: "20:05",
+
                 overallRisk: 64,
 
                 riskLevel: "medium",
@@ -1634,7 +1653,7 @@
                     "Disease risk requires regular monitoring.",
 
                 updated:
-                    "Updated recently",
+                    "Updated 20:05",
 
 
                 diseases: {
@@ -1706,6 +1725,8 @@
 
                 name: "Plot 2",
 
+                updatedTime: "20:05",
+
                 overallRisk: 28,
 
                 riskLevel: "low",
@@ -1716,7 +1737,7 @@
                     "Current environmental conditions are generally favorable.",
 
                 updated:
-                    "Updated recently",
+                    "Updated 20:05",
 
 
                 diseases: {
@@ -1787,68 +1808,53 @@
 
         /* =========================================
            HELPER FUNCTIONS
-        ========================================== */
+        ========================================= */
 
         function getRingColor(risk) {
 
             if (risk >= 70) {
-
                 return "#dc2626";
-
             }
 
             if (risk >= 40) {
-
                 return "#d97706";
-
             }
 
             return "#16a34a";
-
         }
 
 
         function getRiskClass(level) {
 
             if (level === "high") {
-
                 return "risk-high";
-
             }
 
             if (level === "medium") {
-
                 return "risk-medium";
-
             }
 
             return "risk-low";
-
         }
 
 
         function getStatusClass(status) {
 
             if (status === "HIGH") {
-
                 return "status-high";
-
             }
 
             if (status === "LOW") {
-
                 return "status-low";
-
             }
 
             return "status-optimal";
-
         }
 
 
         /* =========================================
            CREATE PLOT CARDS
-        ========================================== */
+        ========================================= */
 
         function createPlotCards() {
 
@@ -1893,7 +1899,13 @@
                     <div class="plot-card-header">
 
                         <div class="plot-name">
+
                             ${plot.name}
+
+                            <span class="plot-updated-time">
+                                · Updated ${plot.updatedTime}
+                            </span>
+
                         </div>
 
                         <div
@@ -2027,7 +2039,7 @@
 
         /* =========================================
            UPDATE DISEASE RISK
-        ========================================== */
+        ========================================= */
 
         function updateDiseaseRisk(plot) {
 
@@ -2071,7 +2083,7 @@
 
         /* =========================================
            UPDATE ENVIRONMENT
-        ========================================== */
+        ========================================= */
 
         function updateMetric(id, metric) {
 
@@ -2103,7 +2115,7 @@
 
         /* =========================================
            OPEN DASHBOARD
-        ========================================== */
+        ========================================= */
 
         function openDashboard(plotId) {
 
@@ -2114,9 +2126,7 @@
 
 
             if (!plot) {
-
                 return;
-
             }
 
 
@@ -2132,10 +2142,19 @@
                 "block";
 
 
+            /* Plot name + update time */
+
             document.getElementById(
                 "dashboardPlotName"
-            ).textContent =
-                plot.name;
+            ).innerHTML = `
+
+                ${plot.name}
+
+                <span class="plot-updated-time">
+                    · Updated ${plot.updatedTime}
+                </span>
+
+            `;
 
 
             /* Overall Risk */
@@ -2199,7 +2218,7 @@
             document.getElementById(
                 "updatedText"
             ).textContent =
-                plot.updated;
+                `Updated ${plot.updatedTime}`;
 
 
             /* Disease */
@@ -2294,7 +2313,7 @@
 
         /* =========================================
            SHOW HOME
-        ========================================== */
+        ========================================= */
 
         function showHomePage() {
 
@@ -2320,7 +2339,7 @@
 
         /* =========================================
            BACK BUTTON
-        ========================================== */
+        ========================================= */
 
         document
             .getElementById("backButton")
@@ -2332,7 +2351,7 @@
 
         /* =========================================
            INITIALIZE
-        ========================================== */
+        ========================================= */
 
         createPlotCards();
 
