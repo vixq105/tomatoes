@@ -1,3 +1,6 @@
+Here is the complete HTML code with the JavaScript logic implemented for plot selection, dashboard rendering, SVG risk ring animations, disease bars, and back navigation.
+
+```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -35,6 +38,1778 @@
     html {
       scroll-behavior: smooth;
       font-family: "Noto Sans Thai", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, #1b251d 0, transparent 35%),
+        radial-gradient(circle at bottom left, #121c14 0, transparent 30%),
+        var(--bg);
+      font-family: "Noto Sans Thai", sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .page {
+      animation: page-in 0.35s ease;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* รูปแบบข้อความสองภาษา */
+
+    .bilingual {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    .english {
+      display: block;
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .thai {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8em;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .thai-light {
+      color: #b5bdb7;
+    }
+
+    /* Header */
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 26px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      display: grid;
+      width: 52px;
+      height: 52px;
+      flex: 0 0 52px;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      font-size: 26px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(21px, 3vw, 30px);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .brand-title-th {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    /* หน้าเลือกแปลง */
+
+    .home-intro {
+      margin: 48px 0 30px;
+      text-align: center;
+    }
+
+    .home-intro .bilingual {
+      align-items: center;
+    }
+
+    .home-intro h2 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 46px);
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .home-intro h2 .thai {
+      margin-top: 5px;
+      font-size: 0.55em;
+    }
+
+    .home-intro p {
+      max-width: 680px;
+      margin: 14px auto 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .intro-en {
+      display: block;
+      color: #c7cec9;
+      font-size: 15px;
+    }
+
+    .intro-th {
+      display: block;
+      margin-top: 3px;
+      font-size: 13px;
+    }
+
+    .plot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .plot-card {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      min-height: 300px;
+      padding: 25px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(136, 214, 108, 0.08),
+          transparent 58%
+        ),
+        rgba(23, 26, 24, 0.95);
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.18);
+      text-align: left;
+      cursor: pointer;
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .plot-card::after {
+      position: absolute;
+      right: -55px;
+      bottom: -70px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(136, 214, 108, 0.04);
+      content: "";
+    }
+
+    .plot-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(136, 214, 108, 0.65);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.28),
+        0 0 25px rgba(136, 214, 108, 0.07);
+    }
+
+    .plot-card:focus-visible {
+      outline: 3px solid rgba(136, 214, 108, 0.4);
+      outline-offset: 4px;
+    }
+
+    .plot-icon {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--panel-soft);
+      font-size: 27px;
+    }
+
+    .plot-name {
+      margin-top: 18px;
+    }
+
+    .plot-name .english {
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .plot-name .thai {
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    .plot-details {
+      display: grid;
+      grid-template-columns: 125px minmax(0, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .plot-detail {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(29, 33, 30, 0.7);
+    }
+
+    .plot-detail-label .english {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .plot-detail-label .thai {
+      font-size: 10px;
+    }
+
+    .plot-detail-value {
+      margin-top: 7px;
+      font-size: 23px;
+      font-weight: 700;
+    }
+
+    .plot-recommendation {
+      margin-top: 7px;
+    }
+
+    .plot-recommendation .english {
+      color: #d6dbd7;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .plot-recommendation .thai {
+      margin-top: 4px;
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .risk-low {
+      color: var(--green);
+    }
+
+    .risk-medium {
+      color: var(--yellow);
+    }
+
+    .risk-high {
+      color: var(--red);
+    }
+
+    .open-plot {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 18px;
+      color: var(--green);
+    }
+
+    .open-plot .english {
+      color: var(--green);
+      font-size: 14px;
+    }
+
+    .open-plot .thai {
+      color: #75b860;
+      font-size: 11px;
+    }
+
+    .open-plot-arrow {
+      font-size: 22px;
+      transition: transform 0.25s ease;
+    }
+
+    .plot-card:hover .open-plot-arrow {
+      transform: translateX(5px);
+    }
+
+    /* ปุ่มย้อนกลับ */
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 20px;
+      padding: 10px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .back-button:hover {
+      border-color: var(--green);
+      background: var(--panel-soft);
+    }
+
+    .back-arrow {
+      font-size: 20px;
+    }
+
+    .back-button .english {
+      font-size: 13px;
+    }
+
+    .back-button .thai {
+      font-size: 10px;
+    }
+
+    /* หัวข้อ Dashboard */
+
+    .dashboard-heading {
+      margin-bottom: 20px;
+    }
+
+    .dashboard-heading h2 {
+      margin: 0;
+    }
+
+    .dashboard-heading h2 .english {
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 700;
+    }
+
+    .dashboard-heading h2 .thai {
+      margin-top: 3px;
+      font-size: 15px;
+    }
+
+    .dashboard-heading p {
+      margin: 8px 0 0;
+    }
+
+    .dashboard-heading p .english {
+      color: #c3cac5;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .dashboard-heading p .thai {
+      margin-top: 2px;
+      font-size: 11px;
+    }
+
+    /* Dashboard */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(23, 26, 24, 0.94);
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .overall {
+      grid-column: 1 / -1;
+      min-height: 370px;
+      padding: 34px;
+    }
+
+    .disease {
+      grid-column: 1 / -1;
+      min-height: 285px;
+      padding: 30px;
+    }
+
+    .recommendation {
+      grid-column: span 7;
+      min-height: 300px;
+      padding: 26px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(136, 214, 108, 0.08),
+          transparent 55%
+        ),
+        var(--panel);
+    }
+
+    .environment {
+      grid-column: span 5;
+      min-height: 300px;
+      padding: 22px;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .card-title h3 {
+      margin: 0;
+    }
+
+    .card-title h3 .english {
+      font-weight: 600;
+    }
+
+    .card-title h3 .thai {
+      margin-top: 2px;
+    }
+
+    .overall .card-title .english {
+      font-size: clamp(23px, 3vw, 30px);
+    }
+
+    .overall .card-title .thai {
+      font-size: 14px;
+    }
+
+    .disease .card-title .english {
+      font-size: clamp(20px, 2.5vw, 25px);
+    }
+
+    .disease .card-title .thai {
+      font-size: 13px;
+    }
+
+    .recommendation .card-title .english {
+      font-size: clamp(18px, 2vw, 22px);
+    }
+
+    .recommendation .card-title .thai {
+      font-size: 12px;
+    }
+
+    .environment .card-title .english {
+      font-size: 18px;
+    }
+
+    .environment .card-title .thai {
+      font-size: 11px;
+    }
+
+    .plot-label {
+      text-align: right;
+    }
+
+    .plot-label .english {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .plot-label .thai {
+      font-size: 10px;
+    }
+
+    /* Overall Risk */
+
+    .risk-content {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      align-items: center;
+      gap: 42px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .risk-ring {
+      position: relative;
+      width: 220px;
+      height: 220px;
+    }
+
+    .risk-ring svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .risk-ring circle {
+      fill: none;
+      stroke-width: 10;
+    }
+
+    .ring-track {
+      stroke: var(--track);
+    }
+
+    .ring-progress {
+      stroke: var(--yellow);
+      stroke-linecap: round;
+      stroke-dasharray: 452.39;
+      stroke-dashoffset: 452.39;
+      transition:
+        stroke-dashoffset 0.8s ease,
+        stroke 0.3s ease;
+      filter: drop-shadow(0 0 7px rgba(246, 200, 95, 0.4));
+    }
+
+    .risk-value {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      text-align: center;
+    }
+
+    .risk-value strong {
+      font-size: 52px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .risk-value .english {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .risk-value .thai {
+      margin-top: 2px;
+      font-size: 10px;
+    }
+
+    .status {
+      display: inline-flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+      padding: 8px 13px;
+      color: var(--yellow);
+      border: 1px solid rgba(246, 200, 95, 0.4);
+      border-radius: 12px;
+      background: rgba(246, 200, 95, 0.08);
+    }
+
+    .status .english {
+      color: inherit;
+      font-size: 13px;
+    }
+
+    .status .thai {
+      color: inherit;
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    .status.low {
+      color: var(--green);
+      border-color: rgba(136, 214, 108, 0.4);
+      background: rgba(136, 214, 108, 0.08);
+    }
+
+    .status.high {
+      color: var(--red);
+      border-color: rgba(239, 106, 103, 0.4);
+      background: rgba(239, 106, 103, 0.08);
+    }
+
+    .risk-description {
+      max-width: 580px;
+      margin: 0;
+    }
+
+    .risk-description .english {
+      color: #c1c8c3;
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.7;
+    }
+
+    .risk-description .thai {
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .updated {
+      margin-top: 20px;
+    }
+
+    .updated .english {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .updated .thai {
+      margin-top: 2px;
+      font-size: 10px;
+    }
+
+    /* Disease Risk */
+
+    .disease-list {
+      display: grid;
+      gap: 24px;
+    }
+
+    .disease-row {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr) 58px;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .disease-name .english {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .disease-name .thai {
+      margin-top: 2px;
+      font-size: 11px;
+    }
+
+    .bar {
+      height: 16px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--track);
+    }
+
+    .bar-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--color);
+      transition: width 0.8s ease;
+      box-shadow:
+        0 0 10px
+        color-mix(in srgb, var(--color), transparent 60%);
+    }
+
+    .percentage {
+      text-align: right;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* Recommendation */
+
+    .alert {
+      padding: 18px;
+      border-left: 3px solid var(--yellow);
+      border-radius: 5px 12px 12px 5px;
+      background: rgba(246, 200, 95, 0.08);
+    }
+
+    .alert-title .english {
+      color: var(--yellow);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .alert-title .thai {
+      margin-top: 2px;
+      color: rgba(246, 200, 95, 0.75);
+      font-size: 12px;
+    }
+
+    .alert-description {
+      margin-top: 10px;
+    }
+
+    .alert-description .english {
+      color: #d4d9d5;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    .alert-description .thai {
+      margin-top: 4px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: grid;
+      gap: 14px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .actions li {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .actions li::before {
+      position: absolute;
+      top: 1px;
+      left: 0;
+      color: var(--green);
+      content: "✓";
+      font-weight: 700;
+    }
+
+    .actions .english {
+      color: #d2d8d3;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .actions .thai {
+      margin-top: 2px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    /* Environmental Factors */
+
+    .environment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      min-width: 0;
+      min-height: 120px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--panel-soft);
+    }
+
+    .metric-icon {
+      font-size: 18px;
+    }
+
+    .metric-label {
+      margin-top: 7px;
+    }
+
+    .metric-label .english {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .metric-label .thai {
+      margin-top: 1px;
+      font-size: 9px;
+    }
+
+    .metric-value {
+      margin-top: 5px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .metric-status {
+      margin-top: 5px;
+      color: var(--green);
+    }
+
+    .metric-status .english {
+      color: inherit;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .metric-status .thai {
+      color: inherit;
+      font-size: 8px;
+      opacity: 0.8;
+    }
+
+    .metric-status.warning {
+      color: var(--yellow);
+    }
+
+    .metric-status.danger {
+      color: var(--red);
+    }
+
+    @keyframes page-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .recommendation,
+      .environment {
+        grid-column: 1 / -1;
+      }
+
+      .environment-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .app {
+        width: min(100% - 20px, 1180px);
+        padding-top: 18px;
+      }
+
+      .plot-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .home-intro {
+        margin-top: 35px;
+      }
+
+      .overall,
+      .disease,
+      .recommendation,
+      .environment {
+        min-height: auto;
+        padding: 20px;
+      }
+
+      .risk-content {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 24px;
+        text-align: center;
+      }
+
+      .risk-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .risk-ring {
+        width: 190px;
+        height: 190px;
+      }
+
+      .risk-value strong {
+        font-size: 44px;
+      }
+
+      .risk-description .english {
+        font-size: 15px;
+      }
+
+      .risk-description .thai {
+        font-size: 12px;
+      }
+
+      .disease-row {
+        grid-template-columns: 1fr 48px;
+        gap: 9px 12px;
+      }
+
+      .disease-name {
+        grid-column: 1 / -1;
+      }
+
+      .environment-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 420px) {
+      .brand {
+        gap: 10px;
+      }
+
+      .brand-icon {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+      }
+
+      .brand h1 {
+        font-size: 18px;
+      }
+
+      .brand-title-th {
+        font-size: 11px;
+      }
+
+      .plot-card {
+        min-height: auto;
+        padding: 20px;
+      }
+
+      .plot-details {
+        grid-template-columns: 1fr;
+      }
+
+      .overall,
+      .disease,
+      .recommendation,
+      .environment {
+        padding: 17px;
+      }
+
+      .overall .card-title .english {
+        font-size: 22px;
+      }
+
+      .disease .card-title .english {
+        font-size: 20px;
+      }
+
+      .environment-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .metric {
+        min-height: 115px;
+        padding: 11px;
+      }
+
+      .metric-value {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+
+    <!-- หน้าเลือกแปลง -->
+    <section id="homePage" class="page">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">🌱</div>
+
+          <div>
+            <h1>Predicted Disease Risk</h1>
+            <span class="brand-title-th">
+              การคาดการณ์ความเสี่ยงโรค
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div class="home-intro">
+        <h2 class="bilingual">
+          <span class="english">Select Tomato Plot</span>
+          <span class="thai">เลือกแปลงมะเขือเทศ</span>
+        </h2>
+
+        <p>
+          <span class="intro-en">
+            Select a plot to view disease risks, recommendations,
+            and environmental information.
+          </span>
+
+          <span class="intro-th">
+            เลือกแปลงเพื่อตรวจสอบความเสี่ยงของโรค
+            คำแนะนำ และข้อมูลสภาพแวดล้อม
+          </span>
+        </p>
+      </div>
+
+      <div id="plotGrid" class="plot-grid"></div>
+    </section>
+
+    <!-- หน้า Dashboard -->
+    <section id="dashboardPage" class="page hidden">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">🌱</div>
+
+          <div>
+            <h1>Predicted Disease Risk</h1>
+            <span class="brand-title-th">
+              การคาดการณ์ความเสี่ยงโรค
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <button id="backButton" class="back-button" type="button">
+        <span class="back-arrow" aria-hidden="true">←</span>
+
+        <span class="bilingual">
+          <span class="english">Back to Plot Selection</span>
+          <span class="thai">กลับไปหน้าเลือกแปลง</span>
+        </span>
+      </button>
+
+      <div class="dashboard-heading">
+        <h2 class="bilingual">
+          <span id="dashboardPlotNameEn" class="english">Plot 1</span>
+          <span id="dashboardPlotNameTh" class="thai">แปลง 1</span>
+        </h2>
+
+        <p class="bilingual">
+          <span class="english">
+            Latest disease risk assessment for this plot
+          </span>
+
+          <span class="thai">
+            ข้อมูลการประเมินความเสี่ยงล่าสุดของแปลง
+          </span>
+        </p>
+      </div>
+
+      <section class="grid">
+
+        <!-- Overall Disease Risk -->
+        <article class="card overall">
+          <div class="card-title">
+            <h3 class="bilingual">
+              <span class="english">Overall Disease Risk</span>
+              <span class="thai">ความเสี่ยงโรคโดยรวม</span>
+            </h3>
+
+            <div class="plot-label">
+              <span id="overallPlotLabelEn" class="english">Plot 1</span>
+              <span id="overallPlotLabelTh" class="thai">แปลง 1</span>
+            </div>
+          </div>
+
+          <div class="risk-content">
+            <div class="risk-ring">
+              <svg
+                viewBox="0 0 170 170"
+                role="img"
+                aria-label="Overall disease risk"
+              >
+                <circle
+                  class="ring-track"
+                  cx="85"
+                  cy="85"
+                  r="72"
+                ></circle>
+
+                <circle
+                  id="riskRingProgress"
+                  class="ring-progress"
+                  cx="85"
+                  cy="85"
+                  r="72"
+                ></circle>
+              </svg>
+
+              <div class="risk-value">
+                <strong id="overallRiskValue">0%</strong>
+                <span class="english">RISK</span>
+                <span class="thai">ความเสี่ยง</span>
+              </div>
+            </div>
+
+            <div class="risk-info">
+              <div id="overallStatus" class="status">
+                <span id="overallStatusEn" class="english">
+                  MODERATE RISK
+                </span>
+
+                <span id="overallStatusTh" class="thai">
+                  ความเสี่ยงปานกลาง
+                </span>
+              </div>
+
+              <p class="risk-description">
+                <span id="overallDescriptionEn" class="english"></span>
+                <span id="overallDescriptionTh" class="thai"></span>
+              </p>
+
+              <div class="updated">
+                <span id="updatedTimeEn" class="english"></span>
+                <span id="updatedTimeTh" class="thai"></span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Disease Risk -->
+        <article class="card disease">
+          <div class="card-title">
+            <h3 class="bilingual">
+              <span class="english">Disease Risk</span>
+              <span class="thai">ความเสี่ยงรายโรค</span>
+            </h3>
+
+            <div class="plot-label">
+              <span class="english">PREDICTION</span>
+              <span class="thai">การคาดการณ์</span>
+            </div>
+          </div>
+
+          <div class="disease-list">
+            <div class="disease-row">
+              <div class="disease-name">
+                <span class="english">Early Blight</span>
+                <span class="thai">โรคใบไหม้ระยะแรก</span>
+              </div>
+
+              <div
+                id="earlyBlightBar"
+                class="bar"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <div
+                  id="earlyBlightFill"
+                  class="bar-fill"
+                  style="--color: var(--orange);"
+                ></div>
+              </div>
+
+              <div id="earlyBlightValue" class="percentage">0%</div>
+            </div>
+
+            <div class="disease-row">
+              <div class="disease-name">
+                <span class="english">Late Blight</span>
+                <span class="thai">โรคใบไหม้ระยะปลาย</span>
+              </div>
+
+              <div
+                id="lateBlightBar"
+                class="bar"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <div
+                  id="lateBlightFill"
+                  class="bar-fill"
+                  style="--color: var(--yellow);"
+                ></div>
+              </div>
+
+              <div id="lateBlightValue" class="percentage">0%</div>
+            </div>
+
+            <div class="disease-row">
+              <div class="disease-name">
+                <span class="english">Powdery Mildew</span>
+                <span class="thai">โรคราแป้ง</span>
+              </div>
+
+              <div
+                id="powderyMildewBar"
+                class="bar"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <div
+                  id="powderyMildewFill"
+                  class="bar-fill"
+                  style="--color: var(--green);"
+                ></div>
+              </div>
+
+              <div id="powderyMildewValue" class="percentage">0%</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Recommendation -->
+        <article class="card recommendation">
+          <div class="card-title">
+            <h3 class="bilingual">
+              <span class="english">Recommendation</span>
+              <span class="thai">คำแนะนำ</span>
+            </h3>
+          </div>
+
+          <div class="alert">
+            <div class="alert-title">
+              <span id="recommendationTitleEn" class="english"></span>
+              <span id="recommendationTitleTh" class="thai"></span>
+            </div>
+
+            <div class="alert-description">
+              <span
+                id="recommendationDescriptionEn"
+                class="english"
+              ></span>
+
+              <span
+                id="recommendationDescriptionTh"
+                class="thai"
+              ></span>
+            </div>
+          </div>
+
+          <ul id="recommendationActions" class="actions"></ul>
+        </article>
+
+        <!-- Environmental Factors -->
+        <article class="card environment">
+          <div class="card-title">
+            <h3 class="bilingual">
+              <span class="english">Environmental Factors</span>
+              <span class="thai">ปัจจัยด้านสภาพแวดล้อม</span>
+            </h3>
+          </div>
+
+          <div class="environment-grid">
+            <div class="metric">
+              <div class="metric-icon" aria-hidden="true">🌡️</div>
+
+              <div class="metric-label">
+                <span class="english">Temperature</span>
+                <span class="thai">อุณหภูมิ</span>
+              </div>
+
+              <div id="temperatureValue" class="metric-value">-</div>
+
+              <div id="temperatureStatus" class="metric-status">
+                <span class="english">-</span>
+                <span class="thai">-</span>
+              </div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-icon" aria-hidden="true">💧</div>
+
+              <div class="metric-label">
+                <span class="english">Humidity</span>
+                <span class="thai">ความชื้นในอากาศ</span>
+              </div>
+
+              <div id="humidityValue" class="metric-value">-</div>
+
+              <div id="humidityStatus" class="metric-status">
+                <span class="english">-</span>
+                <span class="thai">-</span>
+              </div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-icon" aria-hidden="true">🌱</div>
+
+              <div class="metric-label">
+                <span class="english">Soil Moisture</span>
+                <span class="thai">ความชื้นในดิน</span>
+              </div>
+
+              <div id="soilMoistureValue" class="metric-value">-</div>
+
+              <div id="soilMoistureStatus" class="metric-status">
+                <span class="english">-</span>
+                <span class="thai">-</span>
+              </div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-icon" aria-hidden="true">☀️</div>
+
+              <div class="metric-label">
+                <span class="english">Light</span>
+                <span class="thai">ความเข้มแสง</span>
+              </div>
+
+              <div id="lightValue" class="metric-value">-</div>
+
+              <div id="lightStatus" class="metric-status">
+                <span class="english">-</span>
+                <span class="thai">-</span>
+              </div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-icon" aria-hidden="true">🧪</div>
+
+              <div class="metric-label">
+                <span class="english">Soil pH</span>
+                <span class="thai">ค่าความเป็นกรด-ด่างของดิน</span>
+              </div>
+
+              <div id="soilPhValue" class="metric-value">-</div>
+
+              <div id="soilPhStatus" class="metric-status">
+                <span class="english">-</span>
+                <span class="thai">-</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const plots = [
+      {
+        id: 1,
+        nameEn: "Plot 1",
+        nameTh: "แปลง 1",
+        overallRisk: 64,
+        riskLevel: "medium",
+        riskStatusEn: "MODERATE RISK",
+        riskStatusTh: "ความเสี่ยงปานกลาง",
+        descriptionEn:
+          "Environmental conditions currently favor fungal disease development. Close monitoring is recommended.",
+        descriptionTh:
+          "สภาพแวดล้อมปัจจุบันเอื้อต่อการเกิดโรคจากเชื้อรา จึงควรติดตามอาการอย่างใกล้ชิด",
+        updated: "02 SEP 2026 · 19:20",
+
+        diseases: {
+          earlyBlight: 64,
+          lateBlight: 21,
+          powderyMildew: 13
+        },
+
+        environment: {
+          temperature: 29.4,
+          temperatureStatusEn: "HIGH",
+          temperatureStatusTh: "สูง",
+          humidity: 88.2,
+          humidityStatusEn: "HIGH",
+          humidityStatusTh: "สูง",
+          soilMoisture: 76.1,
+          soilMoistureStatusEn: "OPTIMAL",
+          soilMoistureStatusTh: "เหมาะสม",
+          light: 640,
+          lightStatusEn: "LOW",
+          lightStatusTh: "ต่ำ",
+          soilPh: 6.3,
+          soilPhStatusEn: "OPTIMAL",
+          soilPhStatusTh: "เหมาะสม"
+        },
+
+        recommendation: {
+          titleEn: "EARLY BLIGHT WARNING",
+          titleTh: "คำเตือนโรคใบไหม้ระยะแรก",
+          descriptionEn:
+            "High humidity and warm temperature have increased the predicted disease risk.",
+          descriptionTh:
+            "ความชื้นสูงและอุณหภูมิที่อบอุ่นทำให้ความเสี่ยงของโรคเพิ่มขึ้น",
+          actions: [
+            {
+              en: "Inspect lower leaves for brown or concentric spots.",
+              th: "ตรวจสอบใบด้านล่างเพื่อหารอยสีน้ำตาลหรือรอยวงซ้อน"
+            },
+            {
+              en: "Improve ventilation around the plants.",
+              th: "เพิ่มการระบายอากาศรอบต้นมะเขือเทศ"
+            },
+            {
+              en: "Avoid watering leaves during the evening.",
+              th: "หลีกเลี่ยงการรดน้ำโดนใบในช่วงเย็น"
+            }
+          ]
+        }
+      },
+
+      {
+        id: 2,
+        nameEn: "Plot 2",
+        nameTh: "แปลง 2",
+        overallRisk: 28,
+        riskLevel: "low",
+        riskStatusEn: "LOW RISK",
+        riskStatusTh: "ความเสี่ยงต่ำ",
+        descriptionEn:
+          "Environmental conditions are currently stable. Continue normal monitoring and plant care.",
+        descriptionTh:
+          "สภาพแวดล้อมปัจจุบันอยู่ในเกณฑ์ปกติ ควรดำเนินการดูแลรักษาตามปกติ",
+        updated: "02 SEP 2026 · 19:15",
+
+        diseases: {
+          earlyBlight: 15,
+          lateBlight: 28,
+          powderyMildew: 10
+        },
+
+        environment: {
+          temperature: 26.2,
+          temperatureStatusEn: "OPTIMAL",
+          temperatureStatusTh: "เหมาะสม",
+          humidity: 65.0,
+          humidityStatusEn: "OPTIMAL",
+          humidityStatusTh: "เหมาะสม",
+          soilMoisture: 70.0,
+          soilMoistureStatusEn: "OPTIMAL",
+          soilMoistureStatusTh: "เหมาะสม",
+          light: 850,
+          lightStatusEn: "OPTIMAL",
+          lightStatusTh: "เหมาะสม",
+          soilPh: 6.5,
+          soilPhStatusEn: "OPTIMAL",
+          soilPhStatusTh: "เหมาะสม"
+        },
+
+        recommendation: {
+          titleEn: "NORMAL CONDITION",
+          titleTh: "สภาวะปกติ",
+          descriptionEn:
+            "No immediate threats detected. Maintain routine maintenance schedule.",
+          descriptionTh:
+            "ไม่พบความเสี่ยงรุนแรงในขณะนี้ รักษาการดูแลตามรอบปกติ",
+          actions: [
+            {
+              en: "Maintain current irrigation schedule.",
+              th: "รักษาการให้น้ำตามกำหนดเวลาเดิม"
+            },
+            {
+              en: "Regularly check for pests.",
+              th: "ตรวจสอบแมลงศัตรูพืชตามปกติ"
+            }
+          ]
+        }
+      },
+
+      {
+        id: 3,
+        nameEn: "Plot 3",
+        nameTh: "แปลง 3",
+        overallRisk: 82,
+        riskLevel: "high",
+        riskStatusEn: "HIGH RISK",
+        riskStatusTh: "ความเสี่ยงสูง",
+        descriptionEn:
+          "Critical humidity and foliage wetness levels detected. High risk of Late Blight outbreak.",
+        descriptionTh:
+          "พบความชื้นและน้ำบนใบอยู่ในระดับวิกฤต มีความเสี่ยงสูงที่จะเกิดโรคใบไหม้ระยะปลาย",
+        updated: "02 SEP 2026 · 19:25",
+
+        diseases: {
+          earlyBlight: 35,
+          lateBlight: 82,
+          powderyMildew: 40
+        },
+
+        environment: {
+          temperature: 22.1,
+          temperatureStatusEn: "OPTIMAL",
+          temperatureStatusTh: "เหมาะสม",
+          humidity: 94.5,
+          humidityStatusEn: "VERY HIGH",
+          humidityStatusTh: "สูงมาก",
+          soilMoisture: 88.0,
+          soilMoistureStatusEn: "HIGH",
+          soilMoistureStatusTh: "สูง",
+          light: 410,
+          lightStatusEn: "LOW",
+          lightStatusTh: "ต่ำ",
+          soilPh: 6.1,
+          soilPhStatusEn: "OPTIMAL",
+          soilPhStatusTh: "เหมาะสม"
+        },
+
+        recommendation: {
+          titleEn: "LATE BLIGHT SEVERE ALERT",
+          titleTh: "เตือนภัยรุนแรง โรคใบไหม้ระยะปลาย",
+          descriptionEn:
+            "High moisture and low light provide ideal conditions for Phytophthora infestans.",
+          descriptionTh:
+            "ความชื้นสูงและแสงแดดน้อยสร้างสภาวะที่เอื้อต่อการระบาดอย่างหนัก",
+          actions: [
+            {
+              en: "Apply suitable bio-fungicide or protective spray immediately.",
+              th: "ฉีดพ่นสารชีวภัณฑ์หรือยากันเชื้อราป้องกันทันที"
+            },
+            {
+              en: "Prune infected leaves and destroy them outside the field.",
+              th: "ตัดแต่งใบที่มีอาการติดเชื้อและนำไปทำลายรักษานอกแปลง"
+            },
+            {
+              en: "Reduce irrigation until soil moisture stabilizes.",
+              th: "ลดการให้น้ำจนกว่าความชื้นในดินจะกลับสู่ระดับปกติ"
+            }
+          ]
+        }
+      }
+    ];
+
+    // DOM Elements
+    const homePage = document.getElementById("homePage");
+    const dashboardPage = document.getElementById("dashboardPage");
+    const plotGrid = document.getElementById("plotGrid");
+    const backButton = document.getElementById("backButton");
+
+    // Dashboard Header Elements
+    const dashboardPlotNameEn = document.getElementById("dashboardPlotNameEn");
+    const dashboardPlotNameTh = document.getElementById("dashboardPlotNameTh");
+    const overallPlotLabelEn = document.getElementById("overallPlotLabelEn");
+    const overallPlotLabelTh = document.getElementById("overallPlotLabelTh");
+
+    // Overall Risk Elements
+    const riskRingProgress = document.getElementById("riskRingProgress");
+    const overallRiskValue = document.getElementById("overallRiskValue");
+    const overallStatus = document.getElementById("overallStatus");
+    const overallStatusEn = document.getElementById("overallStatusEn");
+    const overallStatusTh = document.getElementById("overallStatusTh");
+    const overallDescriptionEn = document.getElementById("overallDescriptionEn");
+    const overallDescriptionTh = document.getElementById("overallDescriptionTh");
+    const updatedTimeEn = document.getElementById("updatedTimeEn");
+    const updatedTimeTh = document.getElementById("updatedTimeTh");
+
+    // Disease Risk Elements
+    const earlyBlightFill = document.getElementById("earlyBlightFill");
+    const earlyBlightValue = document.getElementById("earlyBlightValue");
+    const lateBlightFill = document.getElementById("lateBlightFill");
+    const lateBlightValue = document.getElementById("lateBlightValue");
+    const powderyMildewFill = document.getElementById("powderyMildewFill");
+    const powderyMildewValue = document.getElementById("powderyMildewValue");
+
+    // Recommendation Elements
+    const recommendationTitleEn = document.getElementById("recommendationTitleEn");
+    const recommendationTitleTh = document.getElementById("recommendationTitleTh");
+    const recommendationDescriptionEn = document.getElementById("recommendationDescriptionEn");
+    const recommendationDescriptionTh = document.getElementById("recommendationDescriptionTh");
+    const recommendationActions = document.getElementById("recommendationActions");
+
+    // Environment Metric Elements
+    const tempVal = document.getElementById("temperatureValue");
+    const tempStatus = document.getElementById("temperatureStatus");
+    const humVal = document.getElementById("humidityValue");
+    const humStatus = document.getElementById("humidityStatus");
+    const soilMoistVal = document.getElementById("soilMoistureValue");
+    const soilMoistStatus = document.getElementById("soilMoistureStatus");
+    const lightVal = document.getElementById("lightValue");
+    const lightStatus = document.getElementById("lightStatus");
+    const soilPhVal = document.getElementById("soilPhValue");
+    const soilPhStatus = document.getElementById("soilPhStatus");
+
+    // Render Plot Selection Cards
+    function renderPlotCards() {
+      plotGrid.innerHTML = "";
+      plots.forEach((plot) => {
+        const card = document.createElement("article");
+        card.className = "plot-card";
+        card.setAttribute("tabindex", "0");
+        card.setAttribute("role", "button");
+
+        let riskClass = "risk-low";
+        if (plot.riskLevel === "medium") riskClass = "risk-medium";
+        if (plot.riskLevel === "high") riskClass = "risk-high";
+
+        card.innerHTML = `
+          <div class="plot-icon">🪴</div>
+          <div class="plot-name bilingual">
+            <span class="english">${plot.nameEn}</span>
+            <span class="thai">${plot.nameTh}</span>
+          </div>
+          <div class="plot-details">
+            <div class="plot-detail">
+              <div class="plot-detail-label bilingual">
+                <span class="english">Overall Risk</span>
+                <span class="thai">ความเสี่ยงโดยรวม</span>
+              </div>
+              <div class="plot-detail-value ${riskClass}">
+                ${plot.overallRisk}%
+              </div>
+            </div>
+            <div class="plot-detail">
+              <div class="plot-detail-label bilingual">
+                <span class="english">Status</span>
+                <span class="thai">สถานะ</span>
+              </div>
+              <div class="plot-recommendation bilingual">
+                <span class="english">${plot.riskStatusEn}</span>
+                <span class="thai">${plot.riskStatusTh}</span>
+              </div>
+            </div>
+          </div>
+          <div class="open-plot">
+            <div class="bilingual">
+              <span class="english">View Dashboard</span>
+              <span class="thai">ดูแดชบอร์ด</span>
+            </div>
+            <span class="open-plot-arrow">→</span>
+          </div>
+        `;
+
+        const openDashboard = () => loadDashboard(plot);
+        card.addEventListener("click", openDashboard);
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openDashboard();
+          }
+        });
+
+        plotGrid.appendChild(card);
+      });
+    }
+
+    // Populate Dashboard Data
+    function loadDashboard(plot) {
+      // Set Header Titles
+      dashboardPlotNameEn.textContent = plot.nameEn;
+      dashboardPlotNameTh.textContent = plot.nameTh;
+      overallPlotLabelEn.textContent = plot.nameEn;
+      overallPlotLabelTh.textContent = plot.nameTh;
+
+      // Overall Risk Calculations & SVG Ring
+      overallRiskValue.textContent = `${plot.overallRisk}%`;
+      const circumference = 452.39; // 2 * pi * 72
+      const offset = circumference - (circumference * plot.overallRisk) / 100;
+      riskRingProgress.style.strokeDashoffset = offset;
+
+      let strokeColor = "var(--green)";
+      if (plot.riskLevel === "medium") strokeColor = "var(--yellow)";
+      if (plot.riskLevel === "high") strokeColor = "var(--red)";
+      riskRingProgress.style.stroke = strokeColor;
+      riskRingProgress.style.filter = `drop-shadow(0 0 7px ${strokeColor})`;
+
+      // Status Badge
+      overallStatus.className = `status ${plot.riskLevel}`;
+      overallStatusEn.textContent = plot.riskStatusEn;
+      overallStatusTh.textContent = plot.riskStatusTh;
+
+      overallDescriptionEn.textContent = plot.descriptionEn;
+      overallDescriptionTh.textContent = plot.descriptionTh;
+
+      updatedTimeEn.textContent = `Updated: ${plot.updated}`;
+      updatedTimeTh.textContent = `อัปเดตล่าสุด: ${plot.updated}`;
+
+      // Disease Risk Bars
+      earlyBlightFill.style.width = `${plot.diseases.earlyBlight}%`;
+      earlyBlightValue.textContent = `${plot.diseases.earlyBlight}%`;
+
+      lateBlightFill.style.width = `${plot.diseases.lateBlight}%`;
+      lateBlightValue.textContent = `${plot.diseases.lateBlight}%`;
+
+      powderyMildewFill.style.width = `${plot.diseases.powderyMildew}%`;
+      powderyMildewValue.textContent = `${plot.diseases.powderyMildew}%`;
+
+      // Recommendation Actions
+      recommendationTitleEn.textContent = plot.recommendation.titleEn;
+      recommendationTitleTh.textContent = plot.recommendation.titleTh;
+      recommendationDescriptionEn.textContent = plot.recommendation.descriptionEn;
+      recommendationDescriptionTh.textContent = plot.recommendation.descriptionTh;
+
+      recommendationActions.innerHTML = "";
+      plot.recommendation.actions.forEach((act) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span class="english">${act.en}</span>
+          <span class="thai">${act.th}</span>
+        `;
+        recommendationActions.appendChild(li);
+      });
+
+      // Environmental Factors
+      function setMetric(valEl, statusEl, val, unit, statusEn, statusTh) {
+        valEl.textContent = `${val}${unit}`;
+        statusEl.querySelector(".english").textContent = statusEn;
+        statusEl.querySelector(".thai").textContent = statusTh;
+
+        statusEl.className = "metric-status";
+        if (statusEn === "HIGH" || statusEn === "LOW") {
+          statusEl.classList.add("warning");
+        } else if (statusEn === "VERY HIGH" || statusEn === "CRITICAL") {
+          statusEl.classList.add("danger");
+        }
+      }
+
+      setMetric(
+        tempVal,
+        tempStatus,
+        plot.environment.temperature,
+        "°C",
+        plot.environment.temperatureStatusEn,
+        plot.environment.temperatureStatusTh
+      );
+      setMetric(
+        humVal,
+        humStatus,
+        plot.environment.humidity,
+        "%",
+        plot.environment.humidityStatusEn,
+        plot.environment.humidityStatusTh
+      );
+      setMetric(
+        soilMoistVal,
+        soilMoistStatus,
+        plot.environment.soilMoisture,
+        "%",
+        plot.environment.soilMoistureStatusEn,
+        plot.environment.soilMoistureStatusTh
+      );
+      setMetric(
+        lightVal,
+        lightStatus,
+        plot.environment.light,
+        " Lux",
+        plot.environment.lightStatusEn,
+        plot.environment.lightStatusTh
+      );
+      setMetric(
+        soilPhVal,
+        soilPhStatus,
+        plot.environment.soilPh,
+        "",
+        plot.environment.soilPhStatusEn,
+        plot.environment.soilPhStatusTh
+      );
+
+      // Page Navigation
+      homePage.classList.add("hidden");
+      dashboardPage.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Back Button Handler
+    backButton.addEventListener("click", () => {
+      dashboardPage.classList.add("hidden");
+      homePage.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    // Initialize App
+    renderPlotCards();
+  </script>
+</body>
+</html>
+
+```      font-family: "Noto Sans Thai", sans-serif;
     }
 
     body {
