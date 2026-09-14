@@ -1,1985 +1,1377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>Predicted Disease Risk</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
-  <style>
-    :root {
-      --bg: #f6f8f6;
-      --panel: #ffffff;
-      --panel-soft: #f1f4f1;
-
-      --border: #dfe5df;
-      --border-dark: #cfd8cf;
-
-      --text: #182018;
-      --text-soft: #4e5950;
-      --muted: #737d75;
-
-      --green: #4f9d45;
-      --green-soft: #edf7eb;
-
-      --yellow: #d39d20;
-      --yellow-soft: #fff8e5;
-
-      --orange: #e37a35;
-      --red: #d9534f;
-      --red-soft: #fdeceb;
-
-      --track: #e7ebe7;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      font-family: "Inter", sans-serif;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-
-      color: var(--text);
-
-      background:
-        radial-gradient(
-          circle at top right,
-          #eef7ec 0,
-          transparent 34%
-        ),
-        radial-gradient(
-          circle at bottom left,
-          #f0f6ef 0,
-          transparent 30%
-        ),
-        var(--bg);
-
-      font-family: "Roboto", sans-serif;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    button {
-      color: inherit;
-    }
-
-    .app {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 32px 0 48px;
-    }
-
-    .page {
-      animation: page-in 0.35s ease;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-
-    /* =========================
-       HEADER
-    ========================= */
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 20px;
-      margin-bottom: 26px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-
-      gap: 14px;
-      min-width: 0;
-    }
-
-    .brand-icon {
-      display: grid;
-
-      width: 52px;
-      height: 52px;
-      flex: 0 0 52px;
-
-      place-items: center;
-
-      border: 1px solid var(--border);
-      border-radius: 14px;
-
-      background: var(--panel);
-
-      box-shadow:
-        0 6px 20px rgba(35, 55, 40, 0.08);
-
-      font-size: 26px;
-    }
-
-    .brand h1 {
-      margin: 0;
-
-      font-size: clamp(21px, 3vw, 30px);
-      font-weight: 700;
-
-      line-height: 1.2;
-    }
-
-
-    /* =========================
-       HOME
-    ========================= */
-
-    .home-intro {
-      margin: 48px 0 30px;
-      text-align: center;
-    }
-
-    .home-intro h2 {
-      margin: 0;
-
-      font-size: clamp(30px, 5vw, 46px);
-      font-weight: 700;
-
-      line-height: 1.25;
-    }
-
-    .home-intro p {
-      max-width: 680px;
-
-      margin: 14px auto 0;
-
-      color: var(--muted);
-
-      line-height: 1.7;
-      font-size: 15px;
-    }
-
-    .plot-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-      gap: 20px;
-    }
-
-    .plot-card {
-      position: relative;
-      overflow: hidden;
-
-      width: 100%;
-      min-height: 280px;
-
-      padding: 25px;
-
-      border: 1px solid var(--border);
-      border-radius: 20px;
-
-      background:
-        linear-gradient(
-          145deg,
-          rgba(79, 157, 69, 0.07),
-          transparent 58%
-        ),
-        var(--panel);
-
-      box-shadow:
-        0 12px 35px rgba(30, 50, 35, 0.08);
-
-      text-align: left;
-
-      cursor: pointer;
-
-      transition:
-        transform 0.25s ease,
-        border-color 0.25s ease,
-        box-shadow 0.25s ease;
-    }
-
-    .plot-card::after {
-      position: absolute;
-
-      right: -55px;
-      bottom: -70px;
-
-      width: 180px;
-      height: 180px;
-
-      border-radius: 50%;
-
-      background:
-        rgba(79, 157, 69, 0.05);
-
-      content: "";
-    }
-
-    .plot-card:hover {
-      transform: translateY(-5px);
-
-      border-color:
-        rgba(79, 157, 69, 0.55);
-
-      box-shadow:
-        0 20px 45px rgba(30, 50, 35, 0.12),
-        0 0 25px rgba(79, 157, 69, 0.08);
-    }
-
-    .plot-card:focus-visible {
-      outline:
-        3px solid rgba(79, 157, 69, 0.25);
-
-      outline-offset: 4px;
-    }
-
-    .plot-icon {
-      display: grid;
-
-      width: 54px;
-      height: 54px;
-
-      place-items: center;
-
-      border: 1px solid var(--border);
-      border-radius: 15px;
-
-      background: var(--panel-soft);
-
-      font-size: 27px;
-    }
-
-    .plot-name {
-      margin-top: 18px;
-    }
-
-    .plot-name .english {
-      font-size: 26px;
-      font-weight: 700;
-    }
-
-    .plot-details {
-      display: grid;
-
-      grid-template-columns:
-        125px minmax(0, 1fr);
-
-      gap: 10px;
-
-      margin-top: 18px;
-    }
-
-    .plot-detail {
-      min-width: 0;
-
-      padding: 14px;
-
-      border: 1px solid var(--border);
-      border-radius: 12px;
-
-      background: var(--panel-soft);
-    }
-
-    .plot-detail-label {
-      color: var(--muted);
-
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .plot-detail-value {
-      margin-top: 7px;
-
-      font-size: 23px;
-      font-weight: 700;
-    }
-
-    .plot-recommendation {
-      margin-top: 7px;
-
-      color: var(--text-soft);
-
-      font-size: 13px;
-      font-weight: 500;
-
-      line-height: 1.5;
-    }
-
-    .open-plot {
-      position: relative;
-      z-index: 1;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      margin-top: 18px;
-
-      color: var(--green);
-
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .open-plot-arrow {
-      font-size: 22px;
-
-      transition:
-        transform 0.25s ease;
-    }
-
-    .plot-card:hover .open-plot-arrow {
-      transform: translateX(5px);
-    }
-
-
-    /* =========================
-       RISK COLORS
-    ========================= */
-
-    .risk-low {
-      color: var(--green);
-    }
-
-    .risk-medium {
-      color: var(--yellow);
-    }
-
-    .risk-high {
-      color: var(--red);
-    }
-
-
-    /* =========================
-       BACK BUTTON
-    ========================= */
-
-    .back-button {
-      display: inline-flex;
-      align-items: center;
-
-      gap: 10px;
-
-      margin: 0 0 20px;
-      padding: 10px 15px;
-
-      border: 1px solid var(--border);
-      border-radius: 12px;
-
-      background: var(--panel);
-
-      box-shadow:
-        0 4px 14px rgba(30, 50, 35, 0.05);
-
-      cursor: pointer;
-
-      transition:
-        background 0.2s ease,
-        border-color 0.2s ease;
-    }
-
-    .back-button:hover {
-      border-color: var(--green);
-
-      background: var(--green-soft);
-    }
-
-    .back-arrow {
-      font-size: 20px;
-    }
-
-    .back-button span:last-child {
-      font-size: 13px;
-    }
-
-
-    /* =========================
-       DASHBOARD HEADING
-    ========================= */
-
-    .dashboard-heading {
-      margin-bottom: 20px;
-    }
-
-    .dashboard-heading h2 {
-      margin: 0;
-
-      font-size: clamp(26px, 4vw, 36px);
-      font-weight: 700;
-    }
-
-    .dashboard-heading p {
-      margin: 8px 0 0;
-
-      color: var(--muted);
-
-      font-size: 13px;
-    }
-
-
-    /* =========================
-       DASHBOARD GRID
-    ========================= */
-
-    .grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(12, minmax(0, 1fr));
-
-      gap: 18px;
-
-      align-items: stretch;
-    }
-
-    .card {
-      overflow: hidden;
-
-      border: 1px solid var(--border);
-      border-radius: 18px;
-
-      background:
-        rgba(255, 255, 255, 0.97);
-
-      box-shadow:
-        0 12px 35px rgba(30, 50, 35, 0.07);
-    }
-
-    .overall {
-      grid-column: 1 / -1;
-
-      min-height: 370px;
-
-      padding: 34px;
-    }
-
-    .disease {
-      grid-column: 1 / -1;
-
-      min-height: 285px;
-
-      padding: 30px;
-    }
-
-    .recommendation {
-      grid-column: span 7;
-
-      min-height: 300px;
-
-      padding: 26px;
-
-      background:
-        linear-gradient(
-          145deg,
-          rgba(79, 157, 69, 0.06),
-          transparent 55%
-        ),
-        var(--panel);
-    }
-
-    .environment {
-      grid-column: span 5;
-
-      min-height: 300px;
-
-      padding: 22px;
-    }
-
-    .card-title {
-      display: flex;
-
-      align-items: flex-start;
-      justify-content: space-between;
-
-      gap: 14px;
-
-      margin-bottom: 22px;
-    }
-
-    .card-title h3 {
-      margin: 0;
-
-      font-size: 22px;
-      font-weight: 600;
-    }
-
-    .plot-label {
-      text-align: right;
-
-      color: var(--muted);
-
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-
-    /* =========================
-       OVERALL RISK
-    ========================= */
-
-    .risk-content {
-      display: grid;
-
-      grid-template-columns:
-        230px minmax(0, 1fr);
-
-      align-items: center;
-
-      gap: 42px;
-
-      max-width: 900px;
-
-      margin: 0 auto;
-    }
-
-    .risk-ring {
-      position: relative;
-
-      width: 220px;
-      height: 220px;
-    }
-
-    .risk-ring svg {
-      display: block;
-
-      width: 100%;
-      height: 100%;
-
-      transform: rotate(-90deg);
-    }
-
-    .risk-ring circle {
-      fill: none;
-
-      stroke-width: 10;
-    }
-
-    .ring-track {
-      stroke: var(--track);
-    }
-
-    .ring-progress {
-      stroke: var(--yellow);
-
-      stroke-linecap: round;
-
-      stroke-dasharray: 452.39;
-      stroke-dashoffset: 452.39;
-
-      transition:
-        stroke-dashoffset 0.8s ease,
-        stroke 0.3s ease;
-
-      filter:
-        drop-shadow(
-          0 0 6px
-          rgba(213, 157, 32, 0.25)
-        );
-    }
-
-    .risk-value {
-      position: absolute;
-
-      inset: 0;
-
-      display: grid;
-
-      place-content: center;
-
-      text-align: center;
-    }
-
-    .risk-value strong {
-      font-size: 52px;
-      font-weight: 700;
-
-      line-height: 1;
-    }
-
-    .risk-value span {
-      margin-top: 8px;
-
-      color: var(--muted);
-
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .status {
-      display: inline-flex;
-
-      margin-bottom: 16px;
-
-      padding: 8px 13px;
-
-      color: var(--yellow);
-
-      border:
-        1px solid
-        rgba(213, 157, 32, 0.35);
-
-      border-radius: 12px;
-
-      background: var(--yellow-soft);
-
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .status.low {
-      color: var(--green);
-
-      border-color:
-        rgba(79, 157, 69, 0.35);
-
-      background:
-        var(--green-soft);
-    }
-
-    .status.high {
-      color: var(--red);
-
-      border-color:
-        rgba(217, 83, 79, 0.35);
-
-      background:
-        var(--red-soft);
-    }
-
-    .risk-description {
-      max-width: 580px;
-
-      margin: 0;
-
-      color: var(--text-soft);
-
-      font-size: 18px;
-      font-weight: 400;
-
-      line-height: 1.7;
-    }
-
-    .updated {
-      margin-top: 20px;
-
-      color: var(--muted);
-
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-
-    /* =========================
-       DISEASE RISK
-    ========================= */
-
-    .disease-list {
-      display: grid;
-
-      gap: 24px;
-    }
-
-    .disease-row {
-      display: grid;
-
-      grid-template-columns:
-        190px minmax(0, 1fr) 58px;
-
-      align-items: center;
-
-      gap: 18px;
-    }
-
-    .disease-name {
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    .bar {
-      height: 16px;
-
-      overflow: hidden;
-
-      border-radius: 999px;
-
-      background: var(--track);
-    }
-
-    .bar-fill {
-      width: 0;
-
-      height: 100%;
-
-      border-radius: inherit;
-
-      background: var(--color);
-
-      transition:
-        width 0.8s ease;
-    }
-
-    .percentage {
-      text-align: right;
-
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-
-    /* =========================
-       RECOMMENDATION
-    ========================= */
-
-    .alert {
-      padding: 18px;
-
-      border-left:
-        3px solid var(--yellow);
-
-      border-radius:
-        5px 12px 12px 5px;
-
-      background:
-        var(--yellow-soft);
-    }
-
-    .alert-title {
-      color: var(--yellow);
-
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .alert-description {
-      margin-top: 10px;
-
-      color: var(--text-soft);
-
-      font-size: 16px;
-      font-weight: 400;
-
-      line-height: 1.6;
-    }
-
-    .actions {
-      display: grid;
-
-      gap: 14px;
-
-      margin: 18px 0 0;
-      padding: 0;
-
-      list-style: none;
-    }
-
-    .actions li {
-      position: relative;
-
-      padding-left: 24px;
-
-      color: var(--text-soft);
-
-      font-size: 14px;
-      font-weight: 500;
-
-      line-height: 1.5;
-    }
-
-    .actions li::before {
-      position: absolute;
-
-      top: 1px;
-      left: 0;
-
-      color: var(--green);
-
-      content: "✓";
-
-      font-weight: 700;
-    }
-
-
-    /* =========================
-       ENVIRONMENT
-    ========================= */
-
-    .environment-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-      gap: 10px;
-    }
-
-    .metric {
-      min-width: 0;
-      min-height: 120px;
-
-      padding: 13px;
-
-      border: 1px solid var(--border);
-      border-radius: 13px;
-
-      background:
-        var(--panel-soft);
-    }
-
-    .metric-icon {
-      font-size: 18px;
-    }
-
-    .metric-label {
-      margin-top: 7px;
-
-      color: var(--muted);
-
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .metric-value {
-      margin-top: 5px;
-
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .metric-status {
-      margin-top: 5px;
-
-      color: var(--green);
-
-      font-size: 10px;
-      font-weight: 600;
-    }
-
-    .metric-status.warning {
-      color: var(--yellow);
-    }
-
-    .metric-status.danger {
-      color: var(--red);
-    }
-
-
-    /* =========================
-       ANIMATION
-    ========================= */
-
-    @keyframes page-in {
-      from {
-        opacity: 0;
-
-        transform:
-          translateY(8px);
-      }
-
-      to {
-        opacity: 1;
-
-        transform:
-          translateY(0);
-      }
-    }
-
-
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media (max-width: 900px) {
-
-      .recommendation,
-      .environment {
-        grid-column: 1 / -1;
-      }
-
-      .environment-grid {
-        grid-template-columns:
-          repeat(3, minmax(0, 1fr));
-      }
-
-    }
-
-
-    @media (max-width: 700px) {
-
-      .app {
-        width:
-          min(100% - 20px, 1180px);
-
-        padding-top: 18px;
-      }
-
-      .plot-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .home-intro {
-        margin-top: 35px;
-      }
-
-      .overall,
-      .disease,
-      .recommendation,
-      .environment {
-        min-height: auto;
-
-        padding: 20px;
-      }
-
-      .risk-content {
-        grid-template-columns: 1fr;
-
-        justify-items: center;
-
-        gap: 24px;
-
-        text-align: center;
-      }
-
-      .risk-info {
-        display: flex;
-
-        flex-direction: column;
-
-        align-items: center;
-      }
-
-      .risk-ring {
-        width: 190px;
-        height: 190px;
-      }
-
-      .risk-value strong {
-        font-size: 44px;
-      }
-
-      .risk-description {
-        font-size: 15px;
-      }
-
-      .disease-row {
-        grid-template-columns:
-          1fr 48px;
-
-        gap: 9px 12px;
-      }
-
-      .disease-name {
-        grid-column: 1 / -1;
-      }
-
-      .environment-grid {
-        grid-template-columns:
-          repeat(2, minmax(0, 1fr));
-      }
-
-    }
-
-
-    @media (max-width: 420px) {
-
-      .brand {
-        gap: 10px;
-      }
-
-      .brand-icon {
-        width: 44px;
-        height: 44px;
-
-        flex-basis: 44px;
-      }
-
-      .brand h1 {
-        font-size: 18px;
-      }
-
-      .plot-card {
-        min-height: auto;
-
-        padding: 20px;
-      }
-
-      .plot-details {
-        grid-template-columns: 1fr;
-      }
-
-      .overall,
-      .disease,
-      .recommendation,
-      .environment {
-        padding: 17px;
-      }
-
-      .environment-grid {
-        grid-template-columns:
-          1fr 1fr;
-
-        gap: 8px;
-      }
-
-      .metric {
-        min-height: 115px;
-
-        padding: 11px;
-      }
-
-      .metric-value {
-        font-size: 16px;
-      }
-
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicted Disease Risk</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 17px;
+        }
+
+        body {
+            font-family: "Inter", Arial, sans-serif;
+            background: #ffffff;
+            color: #1f2937;
+            line-height: 1.65;
+            min-height: 100vh;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        .page {
+            min-height: 100vh;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            width: 100%;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 22px 6%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #e8f5e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .brand h1 {
+            font-size: 30px;
+            font-weight: 800;
+            color: #166534;
+            letter-spacing: -0.5px;
+        }
+
+        /* =========================
+           HOME PAGE
+        ========================= */
+
+        .home-page {
+            display: block;
+        }
+
+        .home-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 70px 6% 90px;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .intro h2 {
+            font-size: 46px;
+            line-height: 1.2;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 18px;
+            letter-spacing: -1px;
+        }
+
+        .intro p {
+            max-width: 760px;
+            margin: auto;
+            color: #6b7280;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .section-title {
+            font-size: 25px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 25px;
+        }
+
+        /* =========================
+           PLOT CARDS
+        ========================= */
+
+        .plot-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 28px;
+        }
+
+        .plot-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 22px;
+            padding: 30px;
+            cursor: pointer;
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .plot-card:hover {
+            transform: translateY(-5px);
+            border-color: #86efac;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
+        }
+
+        .plot-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 28px;
+        }
+
+        .plot-name {
+            font-size: 29px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .risk-badge {
+            padding: 8px 15px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+        }
+
+        .risk-low {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .risk-medium {
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        .risk-high {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        .plot-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .mini-ring {
+            width: 145px;
+            height: 145px;
+            margin: auto;
+            position: relative;
+        }
+
+        .mini-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .mini-ring-bg {
+            fill: none;
+            stroke: #e5e7eb;
+            stroke-width: 13;
+        }
+
+        .mini-ring-progress {
+            fill: none;
+            stroke-width: 13;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .mini-ring-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .mini-ring-value strong {
+            font-size: 31px;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1;
+        }
+
+        .mini-ring-value span {
+            margin-top: 6px;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .plot-details {
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f1f3;
+        }
+
+        .detail-label {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: #111827;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        /* =========================
+           DASHBOARD
+        ========================= */
+
+        .dashboard-page {
+            display: none;
+        }
+
+        .dashboard-container {
+            max-width: 1450px;
+            margin: auto;
+            padding: 45px 6% 80px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            background: #f3f4f6;
+            color: #374151;
+            padding: 11px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 35px;
+            transition: 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: #e5e7eb;
+        }
+
+        .dashboard-heading {
+            margin-bottom: 35px;
+        }
+
+        .dashboard-heading h2 {
+            font-size: 40px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 7px;
+        }
+
+        .dashboard-heading p {
+            color: #6b7280;
+            font-size: 17px;
+        }
+
+        /* =========================
+           DASHBOARD GRID
+        ========================= */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+
+        .dashboard-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 22px;
+            padding: 32px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+        }
+
+        .dashboard-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card-title {
+            font-size: 25px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 27px;
+        }
+
+        /* =========================
+           OVERALL RISK
+        ========================= */
+
+        .overall-risk-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 55px;
+            min-height: 260px;
+        }
+
+        .large-ring {
+            width: 220px;
+            height: 220px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .large-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .large-ring-bg {
+            fill: none;
+            stroke: #e5e7eb;
+            stroke-width: 16;
+        }
+
+        .large-ring-progress {
+            fill: none;
+            stroke-width: 16;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+
+        .large-ring-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .large-ring-text strong {
+            font-size: 58px;
+            line-height: 1;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .large-ring-text span {
+            font-size: 15px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .risk-summary {
+            max-width: 380px;
+        }
+
+        .risk-summary h3 {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .risk-summary p {
+            color: #6b7280;
+            font-size: 18px;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .updated-text {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        /* =========================
+           DISEASE RISK
+        ========================= */
+
+        .disease-list {
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+        }
+
+        .disease-item {
+            width: 100%;
+        }
+
+        .disease-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .disease-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .disease-percent {
+            font-size: 17px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .disease-bar {
+            width: 100%;
+            height: 18px;
+            border-radius: 999px;
+            background: #f0f1f3;
+            overflow: hidden;
+        }
+
+        .disease-progress {
+            height: 100%;
+            border-radius: inherit;
+            transition: width 0.6s ease;
+        }
+
+        .early-blight {
+            background: #ef4444;
+        }
+
+        .late-blight {
+            background: #f59e0b;
+        }
+
+        .powdery-mildew {
+            background: #8b5cf6;
+        }
+
+        /* =========================
+           RECOMMENDATION
+        ========================= */
+
+        .recommendation {
+            border: 1px solid #bbf7d0;
+            background: #f0fdf4;
+            border-radius: 18px;
+            padding: 25px;
+        }
+
+        .recommendation-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #166534;
+            margin-bottom: 9px;
+        }
+
+        .recommendation-description {
+            font-size: 16px;
+            color: #4b5563;
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+
+        .recommendation-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .recommendation-action {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            font-size: 15px;
+            color: #374151;
+        }
+
+        .recommendation-action::before {
+            content: "✓";
+            color: #16a34a;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        /* =========================
+           ENVIRONMENTAL FACTORS
+        ========================= */
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: #f9fafb;
+            border: 1px solid #eef0f2;
+            border-radius: 17px;
+            padding: 22px 18px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 21px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 7px;
+        }
+
+        .metric-status {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 5px 9px;
+            border-radius: 999px;
+        }
+
+        .status-optimal {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .status-high {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        .status-low {
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1050px) {
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .overall-risk-content {
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .plot-grid,
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-card.full-width {
+                grid-column: auto;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .overall-risk-content {
+                flex-direction: column;
+                text-align: center;
+                padding: 10px 0 20px;
+            }
+
+            .risk-summary {
+                max-width: 100%;
+            }
+
+            .intro h2 {
+                font-size: 38px;
+            }
+
+            .dashboard-heading h2 {
+                font-size: 34px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            html {
+                font-size: 16px;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+
+            .brand h1 {
+                font-size: 24px;
+            }
+
+            .brand-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 21px;
+            }
+
+            .home-container,
+            .dashboard-container {
+                padding-left: 5%;
+                padding-right: 5%;
+            }
+
+            .intro {
+                margin-bottom: 42px;
+            }
+
+            .intro h2 {
+                font-size: 33px;
+            }
+
+            .intro p {
+                font-size: 16px;
+            }
+
+            .plot-card,
+            .dashboard-card {
+                padding: 23px;
+            }
+
+            .plot-name {
+                font-size: 25px;
+            }
+
+            .plot-content {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-heading h2 {
+                font-size: 30px;
+            }
+
+            .large-ring {
+                width: 190px;
+                height: 190px;
+            }
+
+            .large-ring-text strong {
+                font-size: 50px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .plot-card-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .intro h2 {
+                font-size: 29px;
+            }
+
+            .card-title {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
-
 
 <body>
 
-  <main class="app">
+<div class="page">
 
     <!-- =========================
-         PLOT SELECTION
+         HEADER
     ========================== -->
 
-    <section
-      id="homePage"
-      class="page"
-    >
-
-      <header class="topbar">
-
-        <div class="brand">
-
-          <div
-            class="brand-icon"
-            aria-hidden="true"
-          >
-            🌱
-          </div>
-
-          <div>
-
-            <h1>
-              Predicted Disease Risk
-            </h1>
-
-          </div>
-
+    <header>
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-icon">🌱</div>
+                <h1>Predicted Disease Risk</h1>
+            </div>
         </div>
-
-      </header>
-
-
-      <div class="home-intro">
-
-        <h2>
-          Select Tomato Plot
-        </h2>
-
-        <p>
-          Select a plot to view disease risks,
-          recommendations, and environmental information.
-        </p>
-
-      </div>
-
-
-      <div
-        id="plotGrid"
-        class="plot-grid"
-      ></div>
-
-    </section>
-
+    </header>
 
 
     <!-- =========================
-         DASHBOARD
+         HOME PAGE
     ========================== -->
 
-    <section
-      id="dashboardPage"
-      class="page hidden"
-    >
+    <main id="homePage" class="home-page">
 
-      <header class="topbar">
+        <div class="home-container">
 
-        <div class="brand">
+            <section class="intro">
+                <h2>Plant Disease Risk Monitoring</h2>
+                <p>
+                    Select a tomato plot to view its predicted disease risk,
+                    environmental conditions, and recommended actions.
+                </p>
+            </section>
 
-          <div
-            class="brand-icon"
-            aria-hidden="true"
-          >
-            🌱
-          </div>
+            <section>
+                <h3 class="section-title">Select Tomato Plot</h3>
 
-          <div>
-
-            <h1>
-              Predicted Disease Risk
-            </h1>
-
-          </div>
+                <div id="plotGrid" class="plot-grid"></div>
+            </section>
 
         </div>
 
-      </header>
+    </main>
 
 
-      <button
-        id="backButton"
-        class="back-button"
-        type="button"
-      >
+    <!-- =========================
+         DASHBOARD PAGE
+    ========================== -->
 
-        <span
-          class="back-arrow"
-          aria-hidden="true"
-        >
-          ←
-        </span>
+    <main id="dashboardPage" class="dashboard-page">
 
-        <span>
-          Back to Plot Selection
-        </span>
+        <div class="dashboard-container">
 
-      </button>
+            <button id="backButton" class="back-button">
+                ← Back to Plots
+            </button>
 
-
-      <div class="dashboard-heading">
-
-        <h2
-          id="dashboardPlotName"
-        >
-          Plot 1
-        </h2>
-
-        <p>
-          Latest disease risk assessment for this plot
-        </p>
-
-      </div>
-
-
-      <section class="grid">
-
-
-        <!-- =========================
-             OVERALL RISK
-        ========================== -->
-
-        <article
-          class="card overall"
-        >
-
-          <div class="card-title">
-
-            <h3>
-              Overall Disease Risk
-            </h3>
-
-            <div
-              id="overallPlotLabel"
-              class="plot-label"
-            >
-              Plot 1
-            </div>
-
-          </div>
-
-
-          <div class="risk-content">
-
-
-            <div class="risk-ring">
-
-              <svg
-                viewBox="0 0 170 170"
-                role="img"
-                aria-label="Overall disease risk"
-              >
-
-                <circle
-                  class="ring-track"
-                  cx="85"
-                  cy="85"
-                  r="72"
-                ></circle>
-
-                <circle
-                  id="riskRingProgress"
-                  class="ring-progress"
-                  cx="85"
-                  cy="85"
-                  r="72"
-                ></circle>
-
-              </svg>
-
-
-              <div class="risk-value">
-
-                <strong
-                  id="overallRiskValue"
-                >
-                  0%
-                </strong>
-
-                <span>
-                  RISK
-                </span>
-
-              </div>
-
+            <div class="dashboard-heading">
+                <h2 id="dashboardPlotName">Plot 1</h2>
+                <p>Detailed disease risk analysis and environmental conditions</p>
             </div>
 
 
+            <div class="dashboard-grid">
 
-            <div class="risk-info">
+                <!-- OVERALL RISK -->
 
-              <div
-                id="overallStatus"
-                class="status"
-              >
-                MODERATE RISK
-              </div>
+                <section class="dashboard-card">
+
+                    <h3 class="card-title">Overall Disease Risk</h3>
+
+                    <div class="overall-risk-content">
+
+                        <div class="large-ring">
+
+                            <svg viewBox="0 0 180 180">
+
+                                <circle
+                                    class="large-ring-bg"
+                                    cx="90"
+                                    cy="90"
+                                    r="72">
+                                </circle>
+
+                                <circle
+                                    id="largeRiskProgress"
+                                    class="large-ring-progress"
+                                    cx="90"
+                                    cy="90"
+                                    r="72">
+                                </circle>
+
+                            </svg>
+
+                            <div class="large-ring-text">
+                                <strong id="largeRiskValue">64%</strong>
+                                <span>Risk</span>
+                            </div>
+
+                        </div>
+
+                        <div class="risk-summary">
+
+                            <h3 id="riskSummaryTitle">Medium Risk</h3>
+
+                            <p id="riskSummaryDescription">
+                                Disease risk requires regular monitoring.
+                            </p>
+
+                            <div id="updatedText" class="updated-text">
+                                Updated recently
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
 
 
-              <p
-                id="overallDescription"
-                class="risk-description"
-              ></p>
+                <!-- DISEASE RISK -->
+
+                <section class="dashboard-card">
+
+                    <h3 class="card-title">Disease Risk Breakdown</h3>
+
+                    <div class="disease-list">
+
+                        <div class="disease-item">
+
+                            <div class="disease-header">
+                                <span class="disease-name">
+                                    Early Blight
+                                </span>
+
+                                <span
+                                    id="earlyBlightValue"
+                                    class="disease-percent">
+                                    64%
+                                </span>
+                            </div>
+
+                            <div class="disease-bar">
+                                <div
+                                    id="earlyBlightBar"
+                                    class="disease-progress early-blight">
+                                </div>
+                            </div>
+
+                        </div>
 
 
-              <div
-                id="updatedTime"
-                class="updated"
-              ></div>
+                        <div class="disease-item">
+
+                            <div class="disease-header">
+                                <span class="disease-name">
+                                    Late Blight
+                                </span>
+
+                                <span
+                                    id="lateBlightValue"
+                                    class="disease-percent">
+                                    21%
+                                </span>
+                            </div>
+
+                            <div class="disease-bar">
+                                <div
+                                    id="lateBlightBar"
+                                    class="disease-progress late-blight">
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="disease-item">
+
+                            <div class="disease-header">
+                                <span class="disease-name">
+                                    Powdery Mildew
+                                </span>
+
+                                <span
+                                    id="powderyMildewValue"
+                                    class="disease-percent">
+                                    13%
+                                </span>
+                            </div>
+
+                            <div class="disease-bar">
+                                <div
+                                    id="powderyMildewBar"
+                                    class="disease-progress powdery-mildew">
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- RECOMMENDATION -->
+
+                <section class="dashboard-card">
+
+                    <h3 class="card-title">Recommendation</h3>
+
+                    <div class="recommendation">
+
+                        <div
+                            id="recommendationTitle"
+                            class="recommendation-title">
+                            Early Blight Warning
+                        </div>
+
+                        <div
+                            id="recommendationDescription"
+                            class="recommendation-description">
+                            Environmental conditions may favor disease development.
+                        </div>
+
+                        <div
+                            id="recommendationActions"
+                            class="recommendation-actions">
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ENVIRONMENTAL FACTORS -->
+
+                <section class="dashboard-card">
+
+                    <h3 class="card-title">Environmental Factors</h3>
+
+                    <div class="metrics-grid">
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                Temperature
+                            </div>
+
+                            <div
+                                id="temperatureValue"
+                                class="metric-value">
+                                29.4 °C
+                            </div>
+
+                            <span
+                                id="temperatureStatus"
+                                class="metric-status status-high">
+                                HIGH
+                            </span>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                Humidity
+                            </div>
+
+                            <div
+                                id="humidityValue"
+                                class="metric-value">
+                                88.2%
+                            </div>
+
+                            <span
+                                id="humidityStatus"
+                                class="metric-status status-high">
+                                HIGH
+                            </span>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                Soil Moisture
+                            </div>
+
+                            <div
+                                id="soilMoistureValue"
+                                class="metric-value">
+                                76.1%
+                            </div>
+
+                            <span
+                                id="soilMoistureStatus"
+                                class="metric-status status-optimal">
+                                OPTIMAL
+                            </span>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                Light
+                            </div>
+
+                            <div
+                                id="lightValue"
+                                class="metric-value">
+                                640 lux
+                            </div>
+
+                            <span
+                                id="lightStatus"
+                                class="metric-status status-low">
+                                LOW
+                            </span>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                Soil pH
+                            </div>
+
+                            <div
+                                id="soilPhValue"
+                                class="metric-value">
+                                6.3
+                            </div>
+
+                            <span
+                                id="soilPhStatus"
+                                class="metric-status status-optimal">
+                                OPTIMAL
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
 
             </div>
 
-          </div>
+        </div>
 
-        </article>
+    </main>
 
+</div>
 
 
-        <!-- =========================
-             DISEASE RISK
-        ========================== -->
+<script>
 
-        <article
-          class="card disease"
-        >
-
-          <div class="card-title">
-
-            <h3>
-              Disease Risk
-            </h3>
-
-            <div class="plot-label">
-              PREDICTION
-            </div>
-
-          </div>
-
-
-          <div class="disease-list">
-
-
-            <div class="disease-row">
-
-              <div class="disease-name">
-                Early Blight
-              </div>
-
-              <div
-                id="earlyBlightBar"
-                class="bar"
-                role="progressbar"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-
-                <div
-                  id="earlyBlightFill"
-                  class="bar-fill"
-                  style="--color: var(--orange);"
-                ></div>
-
-              </div>
-
-              <div
-                id="earlyBlightValue"
-                class="percentage"
-              >
-                0%
-              </div>
-
-            </div>
-
-
-
-            <div class="disease-row">
-
-              <div class="disease-name">
-                Late Blight
-              </div>
-
-              <div
-                id="lateBlightBar"
-                class="bar"
-                role="progressbar"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-
-                <div
-                  id="lateBlightFill"
-                  class="bar-fill"
-                  style="--color: var(--yellow);"
-                ></div>
-
-              </div>
-
-              <div
-                id="lateBlightValue"
-                class="percentage"
-              >
-                0%
-              </div>
-
-            </div>
-
-
-
-            <div class="disease-row">
-
-              <div class="disease-name">
-                Powdery Mildew
-              </div>
-
-              <div
-                id="powderyMildewBar"
-                class="bar"
-                role="progressbar"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-
-                <div
-                  id="powderyMildewFill"
-                  class="bar-fill"
-                  style="--color: var(--green);"
-                ></div>
-
-              </div>
-
-              <div
-                id="powderyMildewValue"
-                class="percentage"
-              >
-                0%
-              </div>
-
-            </div>
-
-
-          </div>
-
-        </article>
-
-
-
-        <!-- =========================
-             RECOMMENDATION
-        ========================== -->
-
-        <article
-          class="card recommendation"
-        >
-
-          <div class="card-title">
-
-            <h3>
-              Recommendation
-            </h3>
-
-          </div>
-
-
-          <div class="alert">
-
-            <div
-              id="recommendationTitle"
-              class="alert-title"
-            ></div>
-
-            <div
-              id="recommendationDescription"
-              class="alert-description"
-            ></div>
-
-          </div>
-
-
-          <ul
-            id="recommendationActions"
-            class="actions"
-          ></ul>
-
-        </article>
-
-
-
-        <!-- =========================
-             ENVIRONMENT
-        ========================== -->
-
-        <article
-          class="card environment"
-        >
-
-          <div class="card-title">
-
-            <h3>
-              Environmental Factors
-            </h3>
-
-          </div>
-
-
-          <div class="environment-grid">
-
-
-            <div class="metric">
-
-              <div class="metric-icon">
-                🌡️
-              </div>
-
-              <div class="metric-label">
-                Temperature
-              </div>
-
-              <div
-                id="temperatureValue"
-                class="metric-value"
-              >
-                -
-              </div>
-
-              <div
-                id="temperatureStatus"
-                class="metric-status"
-              >
-                -
-              </div>
-
-            </div>
-
-
-
-            <div class="metric">
-
-              <div class="metric-icon">
-                💧
-              </div>
-
-              <div class="metric-label">
-                Humidity
-              </div>
-
-              <div
-                id="humidityValue"
-                class="metric-value"
-              >
-                -
-              </div>
-
-              <div
-                id="humidityStatus"
-                class="metric-status"
-              >
-                -
-              </div>
-
-            </div>
-
-
-
-            <div class="metric">
-
-              <div class="metric-icon">
-                🌱
-              </div>
-
-              <div class="metric-label">
-                Soil Moisture
-              </div>
-
-              <div
-                id="soilMoistureValue"
-                class="metric-value"
-              >
-                -
-              </div>
-
-              <div
-                id="soilMoistureStatus"
-                class="metric-status"
-              >
-                -
-              </div>
-
-            </div>
-
-
-
-            <div class="metric">
-
-              <div class="metric-icon">
-                ☀️
-              </div>
-
-              <div class="metric-label">
-                Light
-              </div>
-
-              <div
-                id="lightValue"
-                class="metric-value"
-              >
-                -
-              </div>
-
-              <div
-                id="lightStatus"
-                class="metric-status"
-              >
-                -
-              </div>
-
-            </div>
-
-
-
-            <div class="metric">
-
-              <div class="metric-icon">
-                🧪
-              </div>
-
-              <div class="metric-label">
-                Soil pH
-              </div>
-
-              <div
-                id="soilPhValue"
-                class="metric-value"
-              >
-                -
-              </div>
-
-              <div
-                id="soilPhStatus"
-                class="metric-status"
-              >
-                -
-              </div>
-
-            </div>
-
-
-          </div>
-
-        </article>
-
-
-      </section>
-
-    </section>
-
-  </main>
-
-
-
-  <script>
+    /* =========================
+       DATA
+    ========================== */
 
     const plots = [
 
-      {
-        id: 1,
+        {
+            id: 1,
+            name: "Plot 1",
+            overallRisk: 64,
+            riskLevel: "medium",
+            riskStatus: "Medium Risk",
+            description:
+                "Disease risk requires regular monitoring.",
+            updated:
+                "Updated recently",
 
-        name: "Plot 1",
+            diseases: {
+                earlyBlight: 64,
+                lateBlight: 21,
+                powderyMildew: 13
+            },
 
-        overallRisk: 64,
+            environment: {
+                temperature: {
+                    value: "29.4 °C",
+                    status: "HIGH"
+                },
 
-        riskLevel: "medium",
+                humidity: {
+                    value: "88.2%",
+                    status: "HIGH"
+                },
 
-        riskStatus: "MODERATE RISK",
+                soilMoisture: {
+                    value: "76.1%",
+                    status: "OPTIMAL"
+                },
 
-        description:
-          "Environmental conditions currently favor fungal disease development. Close monitoring is recommended.",
+                light: {
+                    value: "640 lux",
+                    status: "LOW"
+                },
 
-        updated:
-          "02 SEP 2026 · 19:20",
+                soilPh: {
+                    value: "6.3",
+                    status: "OPTIMAL"
+                }
+            },
 
-        diseases: {
-          earlyBlight: 64,
-          lateBlight: 21,
-          powderyMildew: 13
+            recommendation: {
+                title: "Early Blight Warning",
+                description:
+                    "Environmental conditions may favor disease development.",
+                actions: [
+                    "Monitor the leaves for early signs of disease.",
+                    "Improve air circulation around the plants.",
+                    "Avoid excessive moisture on the foliage."
+                ]
+            }
         },
 
-        environment: {
 
-          temperature: 29.4,
-          temperatureStatus: "HIGH",
+        {
+            id: 2,
+            name: "Plot 2",
+            overallRisk: 28,
+            riskLevel: "low",
+            riskStatus: "Low Risk",
+            description:
+                "Current environmental conditions are generally favorable.",
+            updated:
+                "Updated recently",
 
-          humidity: 88.2,
-          humidityStatus: "HIGH",
+            diseases: {
+                earlyBlight: 28,
+                lateBlight: 15,
+                powderyMildew: 8
+            },
 
-          soilMoisture: 76.1,
-          soilMoistureStatus: "OPTIMAL",
+            environment: {
+                temperature: {
+                    value: "26.8 °C",
+                    status: "OPTIMAL"
+                },
 
-          light: 640,
-          lightStatus: "LOW",
+                humidity: {
+                    value: "69.5%",
+                    status: "OPTIMAL"
+                },
 
-          soilPh: 6.3,
-          soilPhStatus: "OPTIMAL"
+                soilMoisture: {
+                    value: "72.4%",
+                    status: "OPTIMAL"
+                },
 
+                light: {
+                    value: "850 lux",
+                    status: "OPTIMAL"
+                },
+
+                soilPh: {
+                    value: "6.5",
+                    status: "OPTIMAL"
+                }
+            },
+
+            recommendation: {
+                title: "Normal Condition",
+                description:
+                    "The current environmental conditions are within a favorable range.",
+                actions: [
+                    "Continue regular monitoring.",
+                    "Maintain stable soil moisture.",
+                    "Keep the growing area well ventilated."
+                ]
+            }
         },
 
-        recommendation: {
 
-          title:
-            "EARLY BLIGHT WARNING",
+        {
+            id: 3,
+            name: "Plot 3",
+            overallRisk: 82,
+            riskLevel: "high",
+            riskStatus: "High Risk",
+            description:
+                "Multiple environmental factors indicate elevated disease risk.",
+            updated:
+                "Updated recently",
 
-          description:
-            "High humidity and warm temperature have increased the predicted disease risk.",
+            diseases: {
+                earlyBlight: 82,
+                lateBlight: 48,
+                powderyMildew: 34
+            },
 
-          actions: [
+            environment: {
+                temperature: {
+                    value: "31.2 °C",
+                    status: "HIGH"
+                },
 
-            "Inspect lower leaves for brown or concentric spots.",
+                humidity: {
+                    value: "92.6%",
+                    status: "HIGH"
+                },
 
-            "Improve ventilation around the plants.",
+                soilMoisture: {
+                    value: "84.5%",
+                    status: "HIGH"
+                },
 
-            "Avoid watering leaves during the evening."
+                light: {
+                    value: "510 lux",
+                    status: "LOW"
+                },
 
-          ]
+                soilPh: {
+                    value: "6.1",
+                    status: "OPTIMAL"
+                }
+            },
 
+            recommendation: {
+                title: "High Disease Risk Warning",
+                description:
+                    "Several environmental conditions may increase the probability of disease development.",
+                actions: [
+                    "Increase air circulation around the plants.",
+                    "Reduce excessive soil moisture.",
+                    "Inspect the plants for visible disease symptoms."
+                ]
+            }
+        },
+
+
+        {
+            id: 4,
+            name: "Plot 4",
+            overallRisk: 46,
+            riskLevel: "medium",
+            riskStatus: "Medium Risk",
+            description:
+                "Moderate disease risk detected, mainly associated with humidity.",
+            updated:
+                "Updated recently",
+
+            diseases: {
+                earlyBlight: 46,
+                lateBlight: 26,
+                powderyMildew: 19
+            },
+
+            environment: {
+                temperature: {
+                    value: "28.1 °C",
+                    status: "OPTIMAL"
+                },
+
+                humidity: {
+                    value: "81.3%",
+                    status: "HIGH"
+                },
+
+                soilMoisture: {
+                    value: "68.7%",
+                    status: "OPTIMAL"
+                },
+
+                light: {
+                    value: "720 lux",
+                    status: "OPTIMAL"
+                },
+
+                soilPh: {
+                    value: "6.4",
+                    status: "OPTIMAL"
+                }
+            },
+
+            recommendation: {
+                title: "Monitor Humidity",
+                description:
+                    "Humidity is slightly elevated and should be monitored to reduce disease risk.",
+                actions: [
+                    "Improve ventilation around the plants.",
+                    "Monitor humidity regularly.",
+                    "Avoid unnecessary overhead watering."
+                ]
+            }
         }
-
-      },
-
-
-      {
-        id: 2,
-
-        name: "Plot 2",
-
-        overallRisk: 28,
-
-        riskLevel: "low",
-
-        riskStatus: "LOW RISK",
-
-        description:
-          "Environmental conditions are currently stable. Continue normal monitoring and plant care.",
-
-        updated:
-          "02 SEP 2026 · 19:18",
-
-        diseases: {
-          earlyBlight: 28,
-          lateBlight: 15,
-          powderyMildew: 8
-        },
-
-        environment: {
-
-          temperature: 26.8,
-          temperatureStatus: "OPTIMAL",
-
-          humidity: 69.5,
-          humidityStatus: "OPTIMAL",
-
-          soilMoisture: 72.4,
-          soilMoistureStatus: "OPTIMAL",
-
-          light: 850,
-          lightStatus: "OPTIMAL",
-
-          soilPh: 6.5,
-          soilPhStatus: "OPTIMAL"
-
-        },
-
-        recommendation: {
-
-          title:
-            "NORMAL CONDITION",
-
-          description:
-            "Current environmental conditions indicate a low disease risk.",
-
-          actions: [
-
-            "Continue routine inspection of the plants.",
-
-            "Maintain the current ventilation level.",
-
-            "Monitor soil moisture before watering."
-
-          ]
-
-        }
-
-      },
-
-
-      {
-        id: 3,
-
-        name: "Plot 3",
-
-        overallRisk: 82,
-
-        riskLevel: "high",
-
-        riskStatus: "HIGH RISK",
-
-        description:
-          "Current environmental conditions strongly favor disease development. Immediate inspection is recommended.",
-
-        updated:
-          "02 SEP 2026 · 19:15",
-
-        diseases: {
-          earlyBlight: 82,
-          lateBlight: 48,
-          powderyMildew: 34
-        },
-
-        environment: {
-
-          temperature: 31.2,
-          temperatureStatus: "HIGH",
-
-          humidity: 92.6,
-          humidityStatus: "HIGH",
-
-          soilMoisture: 84.5,
-          soilMoistureStatus: "HIGH",
-
-          light: 510,
-          lightStatus: "LOW",
-
-          soilPh: 6.1,
-          soilPhStatus: "OPTIMAL"
-
-        },
-
-        recommendation: {
-
-          title:
-            "HIGH DISEASE RISK WARNING",
-
-          description:
-            "Very high humidity and temperature have significantly increased the disease risk.",
-
-          actions: [
-
-            "Inspect all plants immediately for visible symptoms.",
-
-            "Increase airflow and reduce excessive humidity.",
-
-            "Remove infected leaves and isolate affected plants."
-
-          ]
-
-        }
-
-      },
-
-
-      {
-        id: 4,
-
-        name: "Plot 4",
-
-        overallRisk: 46,
-
-        riskLevel: "medium",
-
-        riskStatus: "MODERATE RISK",
-
-        description:
-          "Some environmental factors may support disease development. Regular inspection is recommended.",
-
-        updated:
-          "02 SEP 2026 · 19:10",
-
-        diseases: {
-          earlyBlight: 46,
-          lateBlight: 26,
-          powderyMildew: 19
-        },
-
-        environment: {
-
-          temperature: 28.1,
-          temperatureStatus: "OPTIMAL",
-
-          humidity: 81.3,
-          humidityStatus: "HIGH",
-
-          soilMoisture: 68.7,
-          soilMoistureStatus: "OPTIMAL",
-
-          light: 720,
-          lightStatus: "OPTIMAL",
-
-          soilPh: 6.4,
-          soilPhStatus: "OPTIMAL"
-
-        },
-
-        recommendation: {
-
-          title:
-            "MONITOR HUMIDITY",
-
-          description:
-            "Humidity is above the preferred level and may increase fungal disease risk.",
-
-          actions: [
-
-            "Check leaves for early signs of fungal disease.",
-
-            "Improve airflow between plant rows.",
-
-            "Avoid unnecessary watering during high humidity."
-
-          ]
-
-        }
-
-      }
 
     ];
 
 
-
     /* =========================
-       DOM ELEMENTS
+       HELPER FUNCTIONS
     ========================== */
 
-    const homePage =
-      document.getElementById(
-        "homePage"
-      );
+    function getRingColor(risk) {
 
-    const dashboardPage =
-      document.getElementById(
-        "dashboardPage"
-      );
+        if (risk >= 70) {
+            return "#dc2626";
+        }
 
-    const plotGrid =
-      document.getElementById(
-        "plotGrid"
-      );
+        if (risk >= 40) {
+            return "#d97706";
+        }
 
-    const backButton =
-      document.getElementById(
-        "backButton"
-      );
-
-
-
-    /* =========================
-       RISK HELPERS
-    ========================== */
-
-    const circumference =
-      2 * Math.PI * 72;
+        return "#16a34a";
+    }
 
 
     function getRiskClass(level) {
 
-      if (level === "high") {
-        return "risk-high";
-      }
+        if (level === "high") {
+            return "risk-high";
+        }
 
-      if (level === "low") {
+        if (level === "medium") {
+            return "risk-medium";
+        }
+
         return "risk-low";
-      }
-
-      return "risk-medium";
-
-    }
-
-
-    function getRingColor(level) {
-
-      if (level === "high") {
-        return "var(--red)";
-      }
-
-      if (level === "low") {
-        return "var(--green)";
-      }
-
-      return "var(--yellow)";
-
     }
 
 
     function getStatusClass(status) {
 
-      const value =
-        String(status).toUpperCase();
+        if (status === "HIGH") {
+            return "status-high";
+        }
 
+        if (status === "LOW") {
+            return "status-low";
+        }
 
-      if (value === "HIGH") {
-        return "danger";
-      }
-
-
-      if (value === "LOW") {
-        return "warning";
-      }
-
-
-      return "";
-
+        return "status-optimal";
     }
-
 
 
     /* =========================
@@ -1988,207 +1380,197 @@
 
     function createPlotCards() {
 
-      plotGrid.innerHTML =
-        plots
-          .map((plot) => {
+        const plotGrid = document.getElementById("plotGrid");
 
-            const riskClass =
-              getRiskClass(
-                plot.riskLevel
-              );
+        plotGrid.innerHTML = "";
 
+        plots.forEach(plot => {
 
-            return `
+            const circumference = 2 * Math.PI * 72;
 
-              <button
-                class="plot-card"
-                type="button"
-                data-plot-id="${plot.id}"
-                aria-label="Open ${plot.name}"
-              >
+            const offset =
+                circumference -
+                (plot.overallRisk / 100) * circumference;
 
-                <div
-                  class="plot-icon"
-                  aria-hidden="true"
-                >
-                  🌿
-                </div>
+            const color = getRingColor(plot.overallRisk);
+
+            const card = document.createElement("div");
+
+            card.className = "plot-card";
+
+            card.addEventListener("click", () => {
+                openDashboard(plot.id);
+            });
 
 
-                <div class="plot-name">
+            card.innerHTML = `
 
-                  <span class="english">
-                    ${plot.name}
-                  </span>
+                <div class="plot-card-header">
 
-                </div>
-
-
-                <div class="plot-details">
-
-
-                  <div class="plot-detail">
-
-                    <div class="plot-detail-label">
-                      Risk
+                    <div class="plot-name">
+                        ${plot.name}
                     </div>
 
-                    <div
-                      class="plot-detail-value ${riskClass}"
-                    >
-                      ${plot.overallRisk}%
+                    <div class="risk-badge ${getRiskClass(plot.riskLevel)}">
+                        ${plot.riskStatus}
                     </div>
-
-                  </div>
-
-
-                  <div class="plot-detail">
-
-                    <div class="plot-detail-label">
-                      Recommendation
-                    </div>
-
-                    <div class="plot-recommendation">
-                      ${plot.recommendation.description}
-                    </div>
-
-                  </div>
-
 
                 </div>
 
 
-                <div class="open-plot">
+                <div class="plot-content">
 
-                  <span>
-                    View Plot Details
-                  </span>
+                    <div class="mini-ring">
 
-                  <span
-                    class="open-plot-arrow"
-                    aria-hidden="true"
-                  >
-                    →
-                  </span>
+                        <svg viewBox="0 0 180 180">
+
+                            <circle
+                                class="mini-ring-bg"
+                                cx="90"
+                                cy="90"
+                                r="72">
+                            </circle>
+
+                            <circle
+                                class="mini-ring-progress"
+                                cx="90"
+                                cy="90"
+                                r="72"
+                                stroke="${color}"
+                                stroke-dasharray="${circumference}"
+                                stroke-dashoffset="${offset}">
+                            </circle>
+
+                        </svg>
+
+                        <div class="mini-ring-value">
+
+                            <strong>
+                                ${plot.overallRisk}%
+                            </strong>
+
+                            <span>
+                                Disease Risk
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="plot-details">
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                Early Blight
+                            </span>
+
+                            <span class="detail-value">
+                                ${plot.diseases.earlyBlight}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                Late Blight
+                            </span>
+
+                            <span class="detail-value">
+                                ${plot.diseases.lateBlight}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                Humidity
+                            </span>
+
+                            <span class="detail-value">
+                                ${plot.environment.humidity.value}
+                            </span>
+
+                        </div>
+
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                Temperature
+                            </span>
+
+                            <span class="detail-value">
+                                ${plot.environment.temperature.value}
+                            </span>
+
+                        </div>
+
+                    </div>
 
                 </div>
-
-              </button>
-
             `;
 
-          })
-          .join("");
-
-
-      document
-        .querySelectorAll(".plot-card")
-        .forEach((card) => {
-
-          card.addEventListener(
-            "click",
-            () => {
-
-              openDashboard(
-                Number(
-                  card.dataset.plotId
-                )
-              );
-
-            }
-          );
-
+            plotGrid.appendChild(card);
         });
-
     }
-
 
 
     /* =========================
-       DISEASE BARS
+       UPDATE DISEASE RISK
     ========================== */
 
-    function updateDiseaseRisk(
-      name,
-      value
-    ) {
+    function updateDiseaseRisk(plot) {
 
-      const fill =
-        document.getElementById(
-          `${name}Fill`
-        );
+        document.getElementById("earlyBlightValue").textContent =
+            `${plot.diseases.earlyBlight}%`;
 
-      const valueText =
-        document.getElementById(
-          `${name}Value`
-        );
+        document.getElementById("lateBlightValue").textContent =
+            `${plot.diseases.lateBlight}%`;
 
-      const bar =
-        document.getElementById(
-          `${name}Bar`
-        );
+        document.getElementById("powderyMildewValue").textContent =
+            `${plot.diseases.powderyMildew}%`;
 
 
-      fill.style.width = "0%";
+        document.getElementById("earlyBlightBar").style.width =
+            `${plot.diseases.earlyBlight}%`;
 
+        document.getElementById("lateBlightBar").style.width =
+            `${plot.diseases.lateBlight}%`;
 
-      valueText.textContent =
-        `${value}%`;
-
-
-      bar.setAttribute(
-        "aria-valuenow",
-        value
-      );
-
-
-      requestAnimationFrame(() => {
-
-        requestAnimationFrame(() => {
-
-          fill.style.width =
-            `${value}%`;
-
-        });
-
-      });
-
+        document.getElementById("powderyMildewBar").style.width =
+            `${plot.diseases.powderyMildew}%`;
     }
-
 
 
     /* =========================
-       ENVIRONMENT METRICS
+       UPDATE METRIC
     ========================== */
 
-    function updateMetric(
-      valueId,
-      statusId,
-      value,
-      status
-    ) {
+    function updateMetric(id, metric) {
 
-      document.getElementById(
-        valueId
-      ).textContent = value;
+        const valueElement =
+            document.getElementById(`${id}Value`);
+
+        const statusElement =
+            document.getElementById(`${id}Status`);
 
 
-      const statusElement =
-        document.getElementById(
-          statusId
-        );
+        valueElement.textContent =
+            metric.value;
+
+        statusElement.textContent =
+            metric.status;
 
 
-      statusElement.className =
-        `metric-status ${getStatusClass(status)}`
-          .trim();
-
-
-      statusElement.textContent =
-        status;
-
+        statusElement.className =
+            `metric-status ${getStatusClass(metric.status)}`;
     }
-
 
 
     /* =========================
@@ -2197,264 +1579,190 @@
 
     function openDashboard(plotId) {
 
-      const plot =
-        plots.find(
-          (item) =>
-            item.id === plotId
-        );
+        const plot =
+            plots.find(item => item.id === plotId);
+
+        if (!plot) {
+            return;
+        }
 
 
-      if (!plot) {
-        return;
-      }
+        document.getElementById("homePage").style.display =
+            "none";
+
+        document.getElementById("dashboardPage").style.display =
+            "block";
 
 
-      document.getElementById(
-        "dashboardPlotName"
-      ).textContent =
-        plot.name;
+        document.getElementById("dashboardPlotName").textContent =
+            plot.name;
 
 
-      document.getElementById(
-        "overallPlotLabel"
-      ).textContent =
-        plot.name;
+        /* Overall Risk */
+
+        const circumference =
+            2 * Math.PI * 72;
+
+        const offset =
+            circumference -
+            (plot.overallRisk / 100) * circumference;
 
 
-      document.getElementById(
-        "overallRiskValue"
-      ).textContent =
-        `${plot.overallRisk}%`;
+        const progress =
+            document.getElementById("largeRiskProgress");
 
 
-      document.getElementById(
-        "overallStatus"
-      ).textContent =
-        plot.riskStatus;
+        progress.style.strokeDasharray =
+            circumference;
 
-
-      document.getElementById(
-        "overallDescription"
-      ).textContent =
-        plot.description;
-
-
-      document.getElementById(
-        "updatedTime"
-      ).textContent =
-        `UPDATED: ${plot.updated}`;
-
-
-      const statusElement =
-        document.getElementById(
-          "overallStatus"
-        );
-
-
-      statusElement.className =
-        `status ${
-          plot.riskLevel === "medium"
-            ? ""
-            : plot.riskLevel
-        }`.trim();
-
-
-      const ring =
-        document.getElementById(
-          "riskRingProgress"
-        );
-
-
-      const offset =
-        circumference -
-        (plot.overallRisk / 100) *
-          circumference;
-
-
-      ring.style.strokeDasharray =
-        circumference;
-
-
-      ring.style.strokeDashoffset =
-        circumference;
-
-
-      ring.style.stroke =
-        getRingColor(
-          plot.riskLevel
-        );
-
-
-      requestAnimationFrame(() => {
-
-        requestAnimationFrame(() => {
-
-          ring.style.strokeDashoffset =
+        progress.style.strokeDashoffset =
             offset;
 
+        progress.style.stroke =
+            getRingColor(plot.overallRisk);
+
+
+        document.getElementById("largeRiskValue").textContent =
+            `${plot.overallRisk}%`;
+
+
+        /* Risk Summary */
+
+        const riskTitle =
+            document.getElementById("riskSummaryTitle");
+
+        riskTitle.textContent =
+            plot.riskStatus;
+
+        riskTitle.style.color =
+            getRingColor(plot.overallRisk);
+
+
+        document.getElementById(
+            "riskSummaryDescription"
+        ).textContent =
+            plot.description;
+
+
+        document.getElementById(
+            "updatedText"
+        ).textContent =
+            plot.updated;
+
+
+        /* Disease Risk */
+
+        updateDiseaseRisk(plot);
+
+
+        /* Recommendation */
+
+        document.getElementById(
+            "recommendationTitle"
+        ).textContent =
+            plot.recommendation.title;
+
+
+        document.getElementById(
+            "recommendationDescription"
+        ).textContent =
+            plot.recommendation.description;
+
+
+        const actionsContainer =
+            document.getElementById(
+                "recommendationActions"
+            );
+
+        actionsContainer.innerHTML = "";
+
+
+        plot.recommendation.actions.forEach(action => {
+
+            const element =
+                document.createElement("div");
+
+            element.className =
+                "recommendation-action";
+
+            element.textContent =
+                action;
+
+            actionsContainer.appendChild(element);
         });
 
-      });
+
+        /* Environmental Factors */
+
+        updateMetric(
+            "temperature",
+            plot.environment.temperature
+        );
+
+        updateMetric(
+            "humidity",
+            plot.environment.humidity
+        );
+
+        updateMetric(
+            "soilMoisture",
+            plot.environment.soilMoisture
+        );
+
+        updateMetric(
+            "light",
+            plot.environment.light
+        );
+
+        updateMetric(
+            "soilPh",
+            plot.environment.soilPh
+        );
 
 
-
-      /* Disease Risk */
-
-      updateDiseaseRisk(
-        "earlyBlight",
-        plot.diseases.earlyBlight
-      );
-
-
-      updateDiseaseRisk(
-        "lateBlight",
-        plot.diseases.lateBlight
-      );
-
-
-      updateDiseaseRisk(
-        "powderyMildew",
-        plot.diseases.powderyMildew
-      );
-
-
-
-      /* Recommendation */
-
-      document.getElementById(
-        "recommendationTitle"
-      ).textContent =
-        plot.recommendation.title;
-
-
-      document.getElementById(
-        "recommendationDescription"
-      ).textContent =
-        plot.recommendation.description;
-
-
-      document.getElementById(
-        "recommendationActions"
-      ).innerHTML =
-        plot.recommendation.actions
-          .map(
-            (action) => `
-              <li>
-                ${action}
-              </li>
-            `
-          )
-          .join("");
-
-
-
-      /* Environment */
-
-      updateMetric(
-        "temperatureValue",
-        "temperatureStatus",
-        `${plot.environment.temperature} °C`,
-        plot.environment.temperatureStatus
-      );
-
-
-      updateMetric(
-        "humidityValue",
-        "humidityStatus",
-        `${plot.environment.humidity}%`,
-        plot.environment.humidityStatus
-      );
-
-
-      updateMetric(
-        "soilMoistureValue",
-        "soilMoistureStatus",
-        `${plot.environment.soilMoisture}%`,
-        plot.environment.soilMoistureStatus
-      );
-
-
-      updateMetric(
-        "lightValue",
-        "lightStatus",
-        `${plot.environment.light} lux`,
-        plot.environment.lightStatus
-      );
-
-
-      updateMetric(
-        "soilPhValue",
-        "soilPhStatus",
-        plot.environment.soilPh,
-        plot.environment.soilPhStatus
-      );
-
-
-
-      /* Switch page */
-
-      homePage.classList.add(
-        "hidden"
-      );
-
-
-      dashboardPage.classList.remove(
-        "hidden"
-      );
-
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-
-      document.title =
-        `${plot.name} | Disease Risk`;
-
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 
 
-
     /* =========================
-       BACK TO HOME
+       SHOW HOME PAGE
     ========================== */
 
     function showHomePage() {
 
-      dashboardPage.classList.add(
-        "hidden"
-      );
+        document.getElementById("dashboardPage").style.display =
+            "none";
+
+        document.getElementById("homePage").style.display =
+            "block";
 
 
-      homePage.classList.remove(
-        "hidden"
-      );
-
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-
-      document.title =
-        "Predicted Disease Risk";
-
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 
 
+    /* =========================
+       BACK BUTTON
+    ========================== */
 
-    backButton.addEventListener(
-      "click",
-      showHomePage
-    );
+    document
+        .getElementById("backButton")
+        .addEventListener("click", showHomePage);
 
+
+    /* =========================
+       INITIALIZE
+    ========================== */
 
     createPlotCards();
 
-  </script>
+</script>
 
 </body>
 </html>
-```
